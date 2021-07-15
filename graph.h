@@ -5,33 +5,32 @@
 #include <map>
 #include <iostream>
 
-class vertex
+class Vertex
 {
     private:
         int id;
     public: 
-        vertex(){}
-        vertex(int id_):id(id_){}
+        Vertex(){}
+        Vertex(int id_):id(id_){}
         inline int getId() const {return id;}
-        inline bool operator==(const vertex &v) const {return id==v.getId();}
-        inline bool operator<(const vertex &v) const {return id<v.getId();}//for efficient search
-        inline bool operator>(const vertex &v) const {return id>v.getId();}//for efficient search
+        inline bool operator==(const Vertex &v) const {return id==v.getId();}
+        inline bool operator<(const Vertex &v) const {return id<v.getId();}//for efficient search
+        inline bool operator>(const Vertex &v) const {return id>v.getId();}//for efficient search
         inline void print()const {std::cout<<id;}
 
 
 };
 
 //edge structure. May be the basis of a hyperedge structure later on
-class edge
+class Edge
 {
     private:
-        vertex u, v;
-        bool directed;//always u is the tail, v is the head
-    
+        Vertex u, v;
+
     public:
-        edge(){};
-        inline edge(vertex u_, vertex v_, bool directed_):u(u_), v(v_),directed (directed_){};
-        inline std::vector<vertex> getEndVertices() const {return {u,v};}
+        Edge(){};
+        inline Edge(Vertex u_, Vertex v_):u(u_), v(v_){};
+        inline std::vector<Vertex> getEndVertices() const {return {u,v};}
         inline void print() const {
             u.print();
             std::cout<<" ";
@@ -40,25 +39,43 @@ class edge
         }
 };
 
-class graph
+class Graph
 {
     private:
-        std::map<vertex,std::vector<vertex> > vertexNeighbors;//needed for any effective search
-        std::vector<edge> edges;
+        std::map<Vertex,std::vector<Vertex> > vertexNeighbors;//needed for any effective search
+        std::vector<Edge> edges;
         size_t size;
     public:
-        graph(){
+        inline Graph(){
             size = 0;
-            vertexNeighbors = std::map<vertex,std::vector<vertex> >();
-            edges = std::vector<edge>(0);
+            vertexNeighbors = std::map<Vertex,std::vector<Vertex> >();
+            edges = std::vector<Edge>(0);
         }
 
-        graph(const std::vector<edge>& edgeList);
+        Graph(const std::vector<Edge>& edgeList);
 
         size_t numberOfNodes(){return size;}
         void print();
 
 };
 
+
+/*class DirectedEdge: public Edge
+{
+    private:
+        Vertex u, v;
+        
+    public:
+        edge(){};
+        inline edge(Vertex u_, Vertex v_):u(u_), v(v_){};
+        inline std::vector<Vertex> getEndVertices() const {return {u,v};}
+        inline void print() const {
+            u.print();
+            std::cout<<" ";
+            v.print();
+            std::cout<<std::endl;
+        }
+};
+*/
 
 #endif
