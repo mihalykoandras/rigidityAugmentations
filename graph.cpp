@@ -29,6 +29,33 @@ void Graph::print()
 }
 
 
+DirectedGraph::DirectedGraph(const std::vector<DirectedEdge>& edgeList)
+{   
+        edges = edgeList;
+        std::vector<Vertex> endVertices;
+        for (const DirectedEdge& e: edgeList)
+        {
+            endVertices=e.getEndVertices();
+            //we know that it has 2 vertices u and v. We we use this now, later by hypergraph it might be different
+            Vertex u = endVertices[0];
+            Vertex v = endVertices[1];
+            vertexOutwards[u].push_back(v);
+        }
+        size = vertexOutwards.size();
+}
+
+
+void DirectedGraph::print()
+{
+    std::cout<<"Size of graph: "<<numberOfNodes()<<std::endl;
+    std::cout<<"Edges:"<<std::endl;
+    for (const DirectedEdge& e: edges)
+    {
+        e.print();
+    }
+}
+
+
 int main()
 {
     std::vector<Vertex> V;
@@ -36,12 +63,12 @@ int main()
     {
         V.emplace_back(i);
     }
-    std::vector<Edge> EL;
+    std::vector<DirectedEdge> EL;
     for (int i=0; i<9; i++)
     {
         EL.emplace_back(V[i],V[i+1]);
     }
-    Graph G(EL);
+    DirectedGraph G(EL);
     G.print();
     return 0;
 }
