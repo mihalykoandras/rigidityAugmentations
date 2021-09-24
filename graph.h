@@ -2,98 +2,91 @@
 #define GRAPH_H
 
 #include <vector>
-#include <map>
+#include <list>
 #include <iostream>
+
+class HyperEdge;
+class DirectedHyperEdge;
 
 class Vertex
 {
     private:
         int id;
+        int inDegree;
     public: 
         Vertex(){}
-        Vertex(int id_):id(id_){}
+        explicit Vertex(int id_):id(id_){inDegree=0;}
+        ~Vertex(){/*isInHyperEdge.erase(); headOfHyperEdge.erase();*/}
+
         inline int getId() const {return id;}
         inline bool operator==(const Vertex &v) const {return id==v.getId();}
-        inline bool operator<(const Vertex &v) const {return id<v.getId();}//for efficient search
-        inline bool operator>(const Vertex &v) const {return id>v.getId();}//for efficient search
+        inline bool operator<(const Vertex &v) const {return id<v.getId();} //for efficient search
+        inline bool operator>(const Vertex &v) const {return id>v.getId();} //for efficient search
         inline void print()const {std::cout<<id;}
-
-
+        inline int getInDegree() const {return inDegree;}
+        inline void decreaseInDegree(){inDegree--;} //TODO check if in-degree is >0
+        inline void increaseInDegree(){inDegree++;}
+        std::list<HyperEdge*> isInHyperEdge;
+        std::list<DirectedHyperEdge*> headOfHyperEdge;
 };
 
-//edge structure. May be the basis of a hyperedge structure later on
-class Edge
+class HyperEdge
 {
     protected:
-        Vertex u, v;
+        std::vector<Vertex*> vertices;    
 
     public:
-        Edge(){};
-        inline Edge(Vertex u_, Vertex v_):u(u_), v(v_){};
-        inline std::vector<Vertex> getEndVertices() const {return {u,v};}
+        HyperEdge(const std::vector<Vertex*>& v_):vertices(v_){}
+
+        ~HyperEdge(){/*vertices.clear();*/}
+        inline std::vector<Vertex*> getVertices() const {return vertices;}
         inline void print() const {
-            u.print();
-            std::cout<<" ";
-            v.print();
-            std::cout<<std::endl;
+            for (const auto& v : vertices)
+                {
+                    v->print();
+                    std::cout<<" ";
+                }
+                std::cout<<std::endl;
         }
 };
 
-class Graph
+class DirectedHyperEdge
 {
     private:
-        std::map<Vertex,std::vector<Vertex> > vertexNeighbors;//needed for any effective search
-        std::vector<Edge> edges;
-        size_t size;
+        Vertex *head;
+        HyperEdge *hyperEdge;
     public:
-        inline Graph(){
-            size = 0;
-            vertexNeighbors = std::map<Vertex,std::vector<Vertex> >();
-            edges = std::vector<Edge>();
-        }
-
-        Graph(const std::vector<Edge>& edgeList);
-
-        size_t numberOfNodes(){return size;}
-        void print();
-
+        DirectedHyperEdge(){}
+        DirectedHyperEdge(Vertex* head_, HyperEdge* hyperedge_):head(head_),hyperEdge(hyperedge_){}
+        ~DirectedHyperEdge(){}
+        inline Vertex getHead()const {return *head;}
+        inline void setHead(const Vertex& v) { *head = v;}
 };
 
 
-class DirectedEdge: public Edge
-{   /*Direction always from u to v */
-    public:
-        inline DirectedEdge(Vertex u_, Vertex v_):Edge(u_,v_){};
-        inline void reverse(){
-            Vertex h=u; u=v; v=h;
-        }
-        inline void print() const {
-            u.print();
-            std::cout<<"->";
-            v.print();
-            std::cout<<std::endl;
-        }
-};
-
-
-class DirectedGraph
-{/*should be more like Graph with Directed Edge included, that is, we need a super-edge that will include directed hyperedges, too.
-And then restrictive inheritance for each type */
-    private:
-        std::map<Vertex,std::vector<Vertex> > vertexOutwards;//outwards
-        std::vector<DirectedEdge> edges;
+class DirectedHyperGraph
+{
+    protected:
+        std::vector<Vertex> vertices;
+        std::list<DirectedHyperEdge> directedHyperEdges;
+        std::list<HyperEdge> hyperEdges;
         size_t size;
     public:
-        inline DirectedGraph(){
-            size = 0;
-            vertexOutwards = std::map<Vertex,std::vector<Vertex> >();
-            edges = std::vector<DirectedEdge>();
+        DirectedHyperGraph(){}
+        DirectedHyperGraph(size_t n){
+            size=n;
+            for (size_t i=0; i<n; i++)
+            {
+                vertices.emplace_back(i);
+            }
         }
 
-        DirectedGraph(const std::vector<DirectedEdge>& edgeList);
-
-        size_t numberOfNodes(){return size;}
-        void print();
+        ~DirectedHyperGraph(){}
+        size_t getNumberOfNodes() const {return size;}
+        void addEdge(const Vertex& head);
+        void addHyperEdge();
+        void changeDirection(const Vertex& from, const Vertex& to); 
+        void print() const;
 
 };
 
