@@ -15,18 +15,19 @@ class Vertex {
  public:
         Vertex() {}
         explicit Vertex(int id_):id(id_) {inDegree = 0;}
-        ~Vertex() {/*isInHyperEdge.erase(); headOfHyperEdge.erase();*/}
+        ~Vertex() {}
 
         inline int getId() const {return id;}
+
         inline bool operator==(const Vertex &v) const {return id == v.getId();}
         inline bool operator<(const Vertex &v) const {return id < v.getId();}
         inline bool operator>(const Vertex &v) const {return id > v.getId();}
-        inline void print() const {std::cout << id;}
+
         inline int getInDegree() const {return inDegree;}
         inline void decreaseInDegree() {inDegree--;}  // TODO check if in-degree is >0
         inline void increaseInDegree() {inDegree++;}
-        std::list<HyperEdge*> isInHyperEdge;
-        std::list<DirectedHyperEdge*> headOfHyperEdge;
+
+        inline void print() const {std::cout << id;}
 };
 
 class HyperEdge {
@@ -80,21 +81,27 @@ struct Edge {
         }
 };
 
-
 class SimpleGraph {
-// the very simple basic graph implementation, easy nodes, simple edge list
+// the very simple basic graph implementation, nodes indexed by ints
  private:
     int numberOfVertices;
     std::vector<Edge> edgeList;
+    std::vector<std::vector<int> > neighborLists;
 
  public:
     SimpleGraph() {}
-    explicit SimpleGraph(int n) : numberOfVertices(n) {}
+    explicit SimpleGraph(int n) : numberOfVertices(n) {
+        neighborLists = std::vector<std::vector<int> >(numberOfVertices);}
     SimpleGraph(int n, const std::vector<int>& I, const std::vector<int>& J) {
         numberOfVertices = n;
+        neighborLists = std::vector<std::vector<int> >(numberOfVertices);
+
         if (I.size() == J.size()) {
-            for (int i = 0; i < I.size(); i++ )
+            for (int i = 0; i < I.size(); i++ ){
                 edgeList.emplace_back(I[i], J[i]);
+                neighborLists[I[i]].push_back(J[i]);
+                neighborLists[J[i]].push_back(I[i]);
+            }
         } else {
             // EXCEPTION
             std::cout << "Two list not the same length" << std::endl;
@@ -102,9 +109,15 @@ class SimpleGraph {
     }
 
     inline int getNumberOfNodes() const {return numberOfVertices;}
-    inline void addEdge(int i, int j) {edgeList.emplace_back(i, j);}
+    inline void addEdge(int i, int j) {
+        edgeList.emplace_back(i, j);
+        neighborLists[i].push_back(j);
+        neighborLists[j].push_back(i);
+    }
     inline size_t getNumberOfEdges() const {return edgeList.size();}
     std::vector<Edge> getEdges() const {return edgeList;}
+    std::vector<int> getNeighbors(int i) const {return neighborLists[i];}
+
     void readFromInput();
 };
 
@@ -115,6 +128,9 @@ class DirectedHyperGraph {
         std::list<HyperEdge> undirectedHyperEdges;
         size_t size;
 
+        std::vector<std::list<HyperEdge*> > vertexInHyperEdge;
+        std::vector<std::list<DirectedHyperEdge*> > headOfHyperEdge;
+
  public:
         DirectedHyperGraph() {}
         explicit DirectedHyperGraph(size_t n) {
@@ -122,6 +138,8 @@ class DirectedHyperGraph {
             for (size_t i = 0; i < size; i++) {
                 vertices.emplace_back(i);
             }
+            vertexInHyperEdge = std::vector<std::list<HyperEdge*> >(size);
+            headOfHyperEdge = std::vector<std::list<DirectedHyperEdge*> >(size);
         }
 
         explicit DirectedHyperGraph(const SimpleGraph& G) {
@@ -129,6 +147,9 @@ class DirectedHyperGraph {
             for (size_t i = 0; i < size; i++) {
                 vertices.emplace_back(i);
             }
+            vertexInHyperEdge = std::vector<std::list<HyperEdge*> >(size);
+            headOfHyperEdge = std::vector<std::list<DirectedHyperEdge*> >(size);
+
             std::vector<Edge> graphEdges = G.getEdges();
 
             for (const auto& e : graphEdges) {
