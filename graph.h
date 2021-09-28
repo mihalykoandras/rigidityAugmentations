@@ -164,11 +164,16 @@ class DirectedHyperGraph {
 
         ~DirectedHyperGraph() {}
         inline size_t getNumberOfNodes() const {return size;}
-        void print() const;
+        inline std::list<HyperEdge*> inHyperEdge(int v) const {return vertexInHyperEdge[v];}
+        inline std::list<DirectedHyperEdge*> isHeadOf(int v) const {return headOfHyperEdge[v];}
+
 
         void addHyperEdge(HyperEdge& edge, Vertex& head);
         void changeDirection(DirectedHyperEdge& edge, Vertex& to);
 
+
         void readFromInput();
+        void print() const;
+
 };
 #endif  // GRAPH_H_
