@@ -8,7 +8,7 @@ void SimpleGraph::readFromInput() {
     for (int i = 0; i < numbOfEdges; i++) {
         int a, b;
         std::cin >> a >> b;
-        edgeList.emplace_back(a, b);
+        addEdge(a, b);
     }
 }
 
@@ -20,18 +20,19 @@ void DirectedHyperGraph::print() const {
     }
 }
 
-void DirectedHyperGraph::addHyperEdge(HyperEdge& edge,  Vertex& head) {
+void DirectedHyperGraph::addHyperEdge(HyperEdge& edge,  Vertex head) {
     undirectedHyperEdges.push_back(edge);
-    directedHyperEdges.emplace_back(&head, &undirectedHyperEdges.back());
+    head.print();
+    directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
     headOfHyperEdge[head.getId()].push_back(&directedHyperEdges.back());
     head.increaseInDegree();
 
     for (const auto& v : edge.getVertices()) {
-            vertexInHyperEdge[v->getId()].push_back(&undirectedHyperEdges.back());
+            vertexInHyperEdge[v.getId()].push_back(&undirectedHyperEdges.back());
     }
 }
 
-void DirectedHyperGraph::changeDirection(DirectedHyperEdge& edge, Vertex& to) {
+void DirectedHyperGraph::changeDirection(DirectedHyperEdge& edge, Vertex to) {
     edge.setHead(to);
     headOfHyperEdge[to.getId()].push_back(&edge);
     // from-ból ki kell szedni valahogy.. Ez majd akkor kell, amikor bejárunk, mert tényleg csak ott kell
@@ -44,13 +45,13 @@ void DirectedHyperGraph::readFromInput() {
 
     std::cout << "Edges (head first, finish with -1)" << std::endl;
     for (int i = 0; i < m; i++) {
-        std::vector<Vertex*> edgeVertices;
+        std::vector<Vertex> edgeVertices;
         int  h = -1;
         int v;
         std::cin >> v;
 
         while (v >= 0 && v < getNumberOfNodes()) {
-            edgeVertices.push_back(&vertices[v]);
+            edgeVertices.push_back(vertices[v]);
             if (h == -1)  // Hack to store head
                 h = v;
             std::cin >> v;
