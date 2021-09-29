@@ -12,9 +12,11 @@ class Vertex {
  private:
         int id;
         int inDegree;
+        bool printWithDegree;
+
  public:
         Vertex() {}
-        explicit Vertex(int id_):id(id_) {inDegree = 0;}
+        explicit Vertex(int id_):id(id_) {inDegree = 0; printWithDegree = false;}
         ~Vertex() {}
 
         inline int getId() const {return id;}
@@ -27,21 +29,26 @@ class Vertex {
         inline void decreaseInDegree() {inDegree--;}  // TODO check if in-degree is >0
         inline void increaseInDegree() {inDegree++;}
 
-        inline void print() const {std::cout << id;}
+        inline void print() const {
+            if (printWithDegree)
+                std::cout << "Id: " << id << " d: " << inDegree;
+            else
+                std::cout << id;
+            }
 };
 
 class HyperEdge {
  protected:
-        std::vector<Vertex> vertices;
+        std::vector<Vertex*> vertices;
 
  public:
-        explicit HyperEdge(const std::vector<Vertex>& v_) : vertices(v_) {}
+        explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {}
 
         ~HyperEdge() {/*vertices.clear();*/}
-        inline std::vector<Vertex> getVertices() const {return vertices;}
+        inline std::vector<Vertex*> getVertices() const {return vertices;}
         inline void print() const {
             for (const auto& v : vertices) {
-                    v.print();
+                    v->print();
                     std::cout << " ";
                 }
                 std::cout << std::endl;
@@ -52,17 +59,17 @@ class DirectedHyperEdge {
  private:
         HyperEdge *hyperEdge;
  public:
-            Vertex head;
+            Vertex * head;
 
         DirectedHyperEdge() {}
-        DirectedHyperEdge(Vertex head_, HyperEdge* hyperedge_)
+        DirectedHyperEdge(Vertex * head_, HyperEdge* hyperedge_)
          : head(head_), hyperEdge(hyperedge_) {}
         ~DirectedHyperEdge() {}
-        inline Vertex getHead()const {return head;}
-        inline void setHead(const Vertex& v) {head = v;}
+        inline Vertex * getHead() const {return head;}
+        inline void setHead(Vertex* v) {head = v;}
         inline void print() const {
             std::cout << "Head: ";
-            head.print();
+            head->print();
             std::cout << std::endl;
             std::cout << "Hyperedge: ";
             hyperEdge->print();
@@ -97,7 +104,7 @@ class SimpleGraph {
         neighborLists = std::vector<std::vector<int> >(numberOfVertices);
 
         if (I.size() == J.size()) {
-            for (int i = 0; i < I.size(); i++ ){
+            for (int i = 0; i < I.size(); i++) {
                 edgeList.emplace_back(I[i], J[i]);
                 neighborLists[I[i]].push_back(J[i]);
                 neighborLists[J[i]].push_back(I[i]);
@@ -154,22 +161,31 @@ class DirectedHyperGraph {
 
             for (const auto& e : graphEdges) {
                 std::vector<int> edge = e.getEdge();
-                std::vector<Vertex> edgeVertices = {&vertices[edge[0]], &vertices[edge[1]]};
+                std::vector<Vertex*> edgeVertices = {&vertices[edge[0]], &vertices[edge[1]]};
 
                 HyperEdge newHyperEgde(edgeVertices);
 
-                addHyperEdge(newHyperEgde, vertices[edge[0]]);
+                addHyperEdge(newHyperEgde, &vertices[edge[0]]);
             }
+        }
+
+        DirectedHyperGraph(const DirectedHyperGraph& HG) {
+            vertices = HG.vertices;
+            directedHyperEdges = HG.directedHyperEdges;
+            undirectedHyperEdges = HG. undirectedHyperEdges;
+            size = HG.size;
+            vertexInHyperEdge = HG.vertexInHyperEdge;
+            headOfHyperEdge = HG.headOfHyperEdge;
         }
 
         ~DirectedHyperGraph() {}
         inline size_t getNumberOfNodes() const {return size;}
         inline std::list<HyperEdge*> inHyperEdge(int v) const {return vertexInHyperEdge[v];}
         inline std::list<DirectedHyperEdge*> isHeadOf(int v) const {return headOfHyperEdge[v];}
-        inline Vertex getVertex(int i) const {return vertices[i];}
+        inline Vertex * getVertex(int i) {return &vertices[i];}
 
-        void addHyperEdge(HyperEdge& edge, Vertex head);
-        void changeDirection(DirectedHyperEdge& edge, Vertex to);
+        void addHyperEdge(const HyperEdge& edge, Vertex * head);
+        void changeDirection(DirectedHyperEdge& edge, Vertex * to);
 
 
         void readFromInput();
