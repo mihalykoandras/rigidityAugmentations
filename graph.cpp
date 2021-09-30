@@ -23,19 +23,12 @@ void DirectedHyperGraph::print() const {
 void DirectedHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
-    headOfHyperEdge[head->getId()].push_back(&directedHyperEdges.back());
     head->increaseInDegree();
-
-    for (const auto& v : edge.getVertices()) {
-            vertexInHyperEdge[v->getId()].push_back(&undirectedHyperEdges.back());
-    }
 }
 
 void DirectedHyperGraph::changeDirection(DirectedHyperEdge& edge, Vertex * to) {
     edge.setHead(to);
-    headOfHyperEdge[to->getId()].push_back(&edge);
     to->increaseInDegree();
-    // from-ból ki kell szedni valahogy.. Ez majd akkor kell, amikor bejárunk, mert tényleg csak ott kell
 }
 
 void DirectedHyperGraph::readFromInput() {

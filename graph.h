@@ -13,10 +13,11 @@ class Vertex {
         int id;
         int inDegree;
         bool printWithDegree;
+        bool usedInDFS;
 
  public:
         Vertex() {}
-        explicit Vertex(int id_):id(id_) {inDegree = 0; printWithDegree = false;}
+        explicit Vertex(int id_):id(id_) {inDegree = 0; printWithDegree = false; usedInDFS = false;}
         ~Vertex() {}
 
         inline int getId() const {return id;}
@@ -40,9 +41,9 @@ class Vertex {
 class HyperEdge {
  protected:
         std::vector<Vertex*> vertices;
-
+        bool usedInThisDFS;
  public:
-        explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {}
+        explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {usedInThisDFS = false;}
 
         ~HyperEdge() {/*vertices.clear();*/}
         inline std::vector<Vertex*> getVertices() const {return vertices;}
@@ -53,20 +54,24 @@ class HyperEdge {
                 }
                 std::cout << std::endl;
         }
+        inline bool isUsedInThisDFS() const {return usedInThisDFS;}
+        inline void setUsedInThisDFS(bool used) {usedInThisDFS = used;}
 };
 
 class DirectedHyperEdge {
  private:
         HyperEdge *hyperEdge;
- public:
-            Vertex * head;
+        Vertex * head;
 
+ public:
         DirectedHyperEdge() {}
         DirectedHyperEdge(Vertex * head_, HyperEdge* hyperedge_)
          : head(head_), hyperEdge(hyperedge_) {}
         ~DirectedHyperEdge() {}
         inline Vertex * getHead() const {return head;}
         inline void setHead(Vertex* v) {head = v;}
+        inline HyperEdge * getHyperEdge() {return hyperEdge;}
+
         inline void print() const {
             std::cout << "Head: ";
             head->print();
@@ -129,14 +134,13 @@ class SimpleGraph {
 };
 
 class DirectedHyperGraph {
- protected:
+ protected:  // This contains all vertices, edges, hyperedges, everything
         std::vector<Vertex> vertices;
         std::list<DirectedHyperEdge> directedHyperEdges;
         std::list<HyperEdge> undirectedHyperEdges;
         size_t size;
 
-        std::vector<std::list<HyperEdge*> > vertexInHyperEdge;
-        std::vector<std::list<DirectedHyperEdge*> > headOfHyperEdge;
+        
 
  public:
         DirectedHyperGraph() {}
@@ -145,8 +149,6 @@ class DirectedHyperGraph {
             for (size_t i = 0; i < size; i++) {
                 vertices.emplace_back(i);
             }
-            vertexInHyperEdge = std::vector<std::list<HyperEdge*> >(size);
-            headOfHyperEdge = std::vector<std::list<DirectedHyperEdge*> >(size);
         }
 
         explicit DirectedHyperGraph(const SimpleGraph& G) {
@@ -154,9 +156,7 @@ class DirectedHyperGraph {
             for (size_t i = 0; i < size; i++) {
                 vertices.emplace_back(i);
             }
-            vertexInHyperEdge = std::vector<std::list<HyperEdge*> >(size);
-            headOfHyperEdge = std::vector<std::list<DirectedHyperEdge*> >(size);
-
+            
             std::vector<Edge> graphEdges = G.getEdges();
 
             for (const auto& e : graphEdges) {
@@ -174,15 +174,13 @@ class DirectedHyperGraph {
             directedHyperEdges = HG.directedHyperEdges;
             undirectedHyperEdges = HG. undirectedHyperEdges;
             size = HG.size;
-            vertexInHyperEdge = HG.vertexInHyperEdge;
-            headOfHyperEdge = HG.headOfHyperEdge;
         }
 
         ~DirectedHyperGraph() {}
         inline size_t getNumberOfNodes() const {return size;}
-        inline std::list<HyperEdge*> inHyperEdge(int v) const {return vertexInHyperEdge[v];}
-        inline std::list<DirectedHyperEdge*> isHeadOf(int v) const {return headOfHyperEdge[v];}
+
         inline Vertex * getVertex(int i) {return &vertices[i];}
+        inline std::list<HyperEdge> * getUndirectedHyperEdges() {return &undirectedHyperEdges;}
 
         void addHyperEdge(const HyperEdge& edge, Vertex * head);
         void changeDirection(DirectedHyperEdge& edge, Vertex * to);
@@ -190,6 +188,5 @@ class DirectedHyperGraph {
 
         void readFromInput();
         void print() const;
-
 };
 #endif  // GRAPH_H_
