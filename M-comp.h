@@ -45,9 +45,10 @@ class M_comp_Hyper_Graph :public DirectedHyperGraph {
     inline std::list<DirectedHyperEdge*> isHeadOf(Vertex * v) const {return headOfHyperEdge[v->getId()];}
 
     void addHyperEdge(const HyperEdge& edge, Vertex * head);
-    void changeDirection(DirectedHyperEdge& edge, Vertex * to);
+    void changeDirection(std::list<DirectedHyperEdge*>::iterator& edge, Vertex * to);
 
     std::vector<bool> getSameComponentVector(Vertex * v);
     void MakeMCompHypergraph(const SimpleGraph& G);
+    bool DFS(Vertex * v1, Vertex * v2);
 };
 #endif  // M_COMP_H_

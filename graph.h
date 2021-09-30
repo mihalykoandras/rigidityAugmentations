@@ -5,81 +5,6 @@
 #include <list>
 #include <iostream>
 
-class HyperEdge;
-class DirectedHyperEdge;
-
-class Vertex {
- private:
-        int id;
-        int inDegree;
-        bool printWithDegree;
-        bool usedInDFS;
-
- public:
-        Vertex() {}
-        explicit Vertex(int id_):id(id_) {inDegree = 0; printWithDegree = false; usedInDFS = false;}
-        ~Vertex() {}
-
-        inline int getId() const {return id;}
-
-        inline bool operator==(const Vertex &v) const {return id == v.getId();}
-        inline bool operator<(const Vertex &v) const {return id < v.getId();}
-        inline bool operator>(const Vertex &v) const {return id > v.getId();}
-
-        inline int getInDegree() const {return inDegree;}
-        inline void decreaseInDegree() {inDegree--;}  // TODO check if in-degree is >0
-        inline void increaseInDegree() {inDegree++;}
-
-        inline void print() const {
-            if (printWithDegree)
-                std::cout << "Id: " << id << " d: " << inDegree;
-            else
-                std::cout << id;
-            }
-};
-
-class HyperEdge {
- protected:
-        std::vector<Vertex*> vertices;
-        bool usedInThisDFS;
- public:
-        explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {usedInThisDFS = false;}
-
-        ~HyperEdge() {/*vertices.clear();*/}
-        inline std::vector<Vertex*> getVertices() const {return vertices;}
-        inline void print() const {
-            for (const auto& v : vertices) {
-                    v->print();
-                    std::cout << " ";
-                }
-                std::cout << std::endl;
-        }
-        inline bool isUsedInThisDFS() const {return usedInThisDFS;}
-        inline void setUsedInThisDFS(bool used) {usedInThisDFS = used;}
-};
-
-class DirectedHyperEdge {
- private:
-        HyperEdge *hyperEdge;
-        Vertex * head;
-
- public:
-        DirectedHyperEdge() {}
-        DirectedHyperEdge(Vertex * head_, HyperEdge* hyperedge_)
-         : head(head_), hyperEdge(hyperedge_) {}
-        ~DirectedHyperEdge() {}
-        inline Vertex * getHead() const {return head;}
-        inline void setHead(Vertex* v) {head = v;}
-        inline HyperEdge * getHyperEdge() {return hyperEdge;}
-
-        inline void print() const {
-            std::cout << "Head: ";
-            head->print();
-            std::cout << std::endl;
-            std::cout << "Hyperedge: ";
-            hyperEdge->print();
-        }
-};
 
 struct Edge {
  private:
@@ -133,13 +58,99 @@ class SimpleGraph {
     void readFromInput();
 };
 
+
+class HyperEdge;
+class DirectedHyperEdge;
+
+class Vertex {
+ private:
+        int id;
+        int inDegree;
+        bool printWithDegree;
+        bool usedInDFS;
+        std::list<DirectedHyperEdge*>::iterator comeFrom;
+
+ public:
+        Vertex() {}
+        explicit Vertex(int id_):id(id_) {inDegree = 0; printWithDegree = false; usedInDFS = false;}
+        ~Vertex() {}
+
+        inline int getId() const {return id;}
+
+        inline bool operator==(const Vertex &v) const {return id == v.getId();}
+        inline bool operator<(const Vertex &v) const {return id < v.getId();}
+        inline bool operator>(const Vertex &v) const {return id > v.getId();}
+
+        inline int getInDegree() const {return inDegree;}
+        inline void decreaseInDegree() {inDegree--;}  // TODO check if in-degree is >0
+        inline void increaseInDegree() {inDegree++;}
+        inline bool isUsedInThisDFS() const {return usedInDFS;}
+        inline void setUsedInThisDFS(bool used) {usedInDFS = used;}
+        inline std::list<DirectedHyperEdge*>::iterator getFrom() {return comeFrom;}
+        inline void setIncomingHyperedge(std::list<DirectedHyperEdge*>::iterator from) {comeFrom = from;}
+
+
+        inline void print() const {
+            if (printWithDegree)
+                std::cout << "Id: " << id << " d: " << inDegree;
+            else
+                std::cout << id;
+            }
+};
+
+class HyperEdge {
+ protected:
+        std::vector<Vertex*> vertices;
+        bool usedInThisDFS;
+ public:
+        explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {usedInThisDFS = false;}
+
+        ~HyperEdge() {}
+        inline std::vector<Vertex*> getVertices() const {return vertices;}
+        inline void print() const {
+            for (const auto& v : vertices) {
+                    v->print();
+                    std::cout << " ";
+                }
+                std::cout << std::endl;
+        }
+        inline bool isUsedInThisDFS() const {return usedInThisDFS;}
+        inline void setUsedInThisDFS(bool used) {usedInThisDFS = used;}
+};
+
+class DirectedHyperEdge {
+ private:
+        HyperEdge *hyperEdge;
+        Vertex * head;
+
+ public:
+        DirectedHyperEdge() {}
+        DirectedHyperEdge(Vertex * head_, HyperEdge* hyperedge_)
+         : head(head_), hyperEdge(hyperedge_) {}
+        ~DirectedHyperEdge() {}
+        inline Vertex * getHead() const {return head;}
+        inline void setHead(Vertex* v) {head = v;}
+        inline HyperEdge * getHyperEdge() {return hyperEdge;}
+
+        inline void print() const {
+            std::cout << "Head: ";
+            head->print();
+            std::cout << std::endl;
+            std::cout << "Hyperedge: ";
+            hyperEdge->print();
+        }
+};
+
 class DirectedHyperGraph {
- protected:  // This contains all vertices, edges, hyperedges, everything
+    /*
+        This class contains all data: vertices, hyperedges, directions, directions
+        It does not implement any funcionality over the basics, that is for the M_comp_Hyper_Graph class
+    */
+ protected:
         std::vector<Vertex> vertices;
         std::list<DirectedHyperEdge> directedHyperEdges;
         std::list<HyperEdge> undirectedHyperEdges;
         size_t size;
-
 
  public:
         DirectedHyperGraph() {}
