@@ -151,7 +151,8 @@ class EdgeList{
  public:
     EdgeList() {}
     void push_front(EdgeList** headRef, DirectedHyperEdge* new_data);
-    void deleteNode(EdgeList* nodeToDelete);
+    void deleteNode(EdgeList** headRef, EdgeList* nodeToDelete);
+    EdgeList* getNext() {return next;}
     DirectedHyperEdge* getEdge() const {return edge;}
     void setEdge(DirectedHyperEdge* edge_) {edge = edge_;}
 };

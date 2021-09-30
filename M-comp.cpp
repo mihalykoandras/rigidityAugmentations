@@ -21,7 +21,7 @@ void M_comp_Hyper_Graph::changeDirection(EdgeList* edge, Vertex * to) {
     realEdge->setHead(to);
     headOfHyperEdge[to->getId()]->push_front(&headOfHyperEdge[to->getId()], realEdge);
     to->increaseInDegree();
-    headOfHyperEdge[from->getId()]->deleteNode(edge);
+    headOfHyperEdge[from->getId()]->deleteNode(&headOfHyperEdge[from->getId()], edge);//Ha egy pont van, akkor hogyan törlünk? 
 }
 
 
@@ -48,14 +48,14 @@ bool M_comp_Hyper_Graph::DFS(Vertex * v1, Vertex * v2) {
         v.setUsedInThisDFS(false);
     }
     std::queue<Vertex *> Q;
-    if (v1->getInDegree() < k) {
-        Q.push(v1);
-        v1->setUsedInThisDFS(true);
-    }
-    if (v2->getInDegree() < k) {
-        Q.push(v2);
-        v2->setUsedInThisDFS(true);
-    }
+
+    Q.push(v1);
+    v1->setUsedInThisDFS(true);
+
+    
+    Q.push(v2);
+    v2->setUsedInThisDFS(true);
+    
 
     while (!Q.empty()) {
         Vertex * actualVertex = Q.front();
@@ -87,6 +87,7 @@ bool M_comp_Hyper_Graph::DFS(Vertex * v1, Vertex * v2) {
                         }
                     }
                 }
+                nodeList = nodeList->getNext();
             }
         }
     }

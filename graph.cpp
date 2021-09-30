@@ -29,12 +29,12 @@ void EdgeList::push_front(EdgeList** headRef, DirectedHyperEdge* new_data) {
     (*headRef) = new_node;
 }
 
-void EdgeList::deleteNode(EdgeList* nodeToDelete) {
+void EdgeList::deleteNode(EdgeList** headRef, EdgeList* nodeToDelete) {
     if (nodeToDelete == NULL)
         return;
+    if (*headRef == nodeToDelete)
+        *headRef = nodeToDelete->next;
 
-    /* Change next only if node to be
-    deleted is NOT the last node */
     if (nodeToDelete->next != NULL)
         nodeToDelete->next->prev = nodeToDelete->prev;
 
@@ -42,6 +42,7 @@ void EdgeList::deleteNode(EdgeList* nodeToDelete) {
     deleted is NOT the first node */
     if (nodeToDelete->prev != NULL)
         nodeToDelete->prev->next = nodeToDelete->next;
+
     return;
 }
 
