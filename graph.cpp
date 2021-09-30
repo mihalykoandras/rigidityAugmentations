@@ -12,6 +12,40 @@ void SimpleGraph::readFromInput() {
     }
 }
 
+/*void EdgeList::push_front(EdgeList** headRef, DirectedHyperEdge* new_data) {
+        EdgeList* new_node = new EdgeList();
+        new_node->edge = new_data;
+        new_node->next = (*headRef);
+        (*headRef) = new_node;
+}*/
+
+void EdgeList::push_front(EdgeList** headRef, DirectedHyperEdge* new_data) {
+    EdgeList* new_node = new EdgeList();
+    new_node->edge = new_data;
+    new_node->prev = NULL;
+    new_node->next = this;
+    if ((*headRef) != NULL)
+        (*headRef)->prev = new_node;
+    (*headRef) = new_node;
+}
+
+void EdgeList::deleteNode(EdgeList* nodeToDelete) {
+    if (nodeToDelete == NULL)
+        return;
+
+    /* Change next only if node to be
+    deleted is NOT the last node */
+    if (nodeToDelete->next != NULL)
+        nodeToDelete->next->prev = nodeToDelete->prev;
+
+    /* Change prev only if node to be
+    deleted is NOT the first node */
+    if (nodeToDelete->prev != NULL)
+        nodeToDelete->prev->next = nodeToDelete->next;
+    return;
+}
+
+
 void DirectedHyperGraph::print() const {
     std::cout << "Number of Nodes: " << getNumberOfNodes() << std::endl;
     std::cout << "Edges:" << std::endl;

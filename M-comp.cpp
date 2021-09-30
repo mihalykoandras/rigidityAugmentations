@@ -6,7 +6,7 @@
 void M_comp_Hyper_Graph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
-    headOfHyperEdge[head->getId()].push_back(&directedHyperEdges.back());
+    headOfHyperEdge[head->getId()]->push_front(&headOfHyperEdge[head->getId()], &directedHyperEdges.back());
     head->increaseInDegree();
 
     for (const auto& v : edge.getVertices()) {
@@ -14,20 +14,14 @@ void M_comp_Hyper_Graph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
     }
 }
 
-void M_comp_Hyper_Graph::changeDirection(std::list<DirectedHyperEdge*>::iterator& edge, Vertex * to) {
-    DirectedHyperEdge * realEdge = *edge;
+void M_comp_Hyper_Graph::changeDirection(EdgeList* edge, Vertex * to) {
+    DirectedHyperEdge * realEdge = edge->getEdge();
     Vertex * from = realEdge->getHead();
     from->decreaseInDegree();
     realEdge->setHead(to);
-    headOfHyperEdge[to->getId()].push_back(realEdge);
+    headOfHyperEdge[to->getId()]->push_front(&headOfHyperEdge[to->getId()], realEdge);
     to->increaseInDegree();
-
-    //delete form list
-    std::list<DirectedHyperEdge*>::iterator nextit = std::next(edge, 1);
-    if (nextit == headOfHyperEdge[to->getId()].end())
-        headOfHyperEdge[from->getId()].pop_back();
-    else
-        *edge = *nextit;
+    headOfHyperEdge[from->getId()]->deleteNode(edge);
 }
 
 
@@ -72,27 +66,27 @@ bool M_comp_Hyper_Graph::DFS(Vertex * v1, Vertex * v2) {
             // and return
             Vertex * v = actualVertex;
             do {
-                std::list<DirectedHyperEdge*>::iterator comeFrom = actualVertex->getFrom();
-                v = (*comeFrom)->getHead();
+                EdgeList* comeFrom = actualVertex->getFrom();
+                v = comeFrom->getEdge()->getHead();
                 changeDirection(comeFrom, actualVertex);
                 actualVertex = v;
             } while ( !((*actualVertex == *v1) || (*actualVertex == *v2)) );
             return true;
         } else {
-            std::list<DirectedHyperEdge*> canPropagate = isHeadOf(actualVertex);
-            std::list<DirectedHyperEdge*>::iterator dirEdge;
-             for (dirEdge = canPropagate.begin(); dirEdge!= canPropagate.end(); dirEdge++) {
-                 if (!((*dirEdge)->getHyperEdge()->isUsedInThisDFS())) {
+            EdgeList * nodeList = isHeadOf(actualVertex);
+            while (nodeList !=NULL) {
+                DirectedHyperEdge* dirEdge = nodeList->getEdge();
+                if (!dirEdge->getHyperEdge()->isUsedInThisDFS()) {
                      // This can be used for transverse back
-                     std::vector<Vertex *> edgeVertices = (*dirEdge)->getHyperEdge()->getVertices();
-                     for (Vertex* newVert : edgeVertices) {
+                    std::vector<Vertex *> edgeVertices = dirEdge->getHyperEdge()->getVertices();
+                    for (Vertex* newVert : edgeVertices) {
                         if (!newVert->isUsedInThisDFS()) {
                             Q.push(newVert);
                             newVert->setUsedInThisDFS(true);
-                            newVert->setIncomingHyperedge(dirEdge);
+                            newVert->setIncomingHyperedge(nodeList);
                         }
-                     }
-                 }
+                    }
+                }
             }
         }
     }

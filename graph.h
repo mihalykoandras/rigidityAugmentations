@@ -61,6 +61,7 @@ class SimpleGraph {
 
 class HyperEdge;
 class DirectedHyperEdge;
+class EdgeList;
 
 class Vertex {
  private:
@@ -68,7 +69,7 @@ class Vertex {
         int inDegree;
         bool printWithDegree;
         bool usedInDFS;
-        std::list<DirectedHyperEdge*>::iterator comeFrom;
+        EdgeList* comeFrom;
 
  public:
         Vertex() {}
@@ -86,8 +87,8 @@ class Vertex {
         inline void increaseInDegree() {inDegree++;}
         inline bool isUsedInThisDFS() const {return usedInDFS;}
         inline void setUsedInThisDFS(bool used) {usedInDFS = used;}
-        inline std::list<DirectedHyperEdge*>::iterator getFrom() {return comeFrom;}
-        inline void setIncomingHyperedge(std::list<DirectedHyperEdge*>::iterator from) {comeFrom = from;}
+        inline EdgeList* getFrom() {return comeFrom;}
+        inline void setIncomingHyperedge(EdgeList* from) {comeFrom = from;}
 
 
         inline void print() const {
@@ -139,6 +140,20 @@ class DirectedHyperEdge {
             std::cout << "Hyperedge: ";
             hyperEdge->print();
         }
+};
+
+class EdgeList{
+ private:
+    DirectedHyperEdge* edge;
+    EdgeList* prev;
+    EdgeList* next;
+
+ public:
+    EdgeList() {}
+    void push_front(EdgeList** headRef, DirectedHyperEdge* new_data);
+    void deleteNode(EdgeList* nodeToDelete);
+    DirectedHyperEdge* getEdge() const {return edge;}
+    void setEdge(DirectedHyperEdge* edge_) {edge = edge_;}
 };
 
 class DirectedHyperGraph {

@@ -12,7 +12,7 @@ class M_comp_Hyper_Graph :public DirectedHyperGraph {
     unsigned int k;
     int ell;
     std::vector<std::list<HyperEdge*> > vertexInHyperEdge;
-    std::vector<std::list<DirectedHyperEdge*> > headOfHyperEdge;
+    std::vector<EdgeList* > headOfHyperEdge;
     SimpleGraph SpanningGraph;
 
  public:
@@ -25,7 +25,7 @@ class M_comp_Hyper_Graph :public DirectedHyperGraph {
             vertices.emplace_back(i);
         }
         vertexInHyperEdge = std::vector<std::list<HyperEdge*> >(size);
-        headOfHyperEdge = std::vector<std::list<DirectedHyperEdge*> >(size);
+        headOfHyperEdge = std::vector<EdgeList* >(size);
     }
 
     M_comp_Hyper_Graph(const M_comp_Hyper_Graph& HG) {
@@ -42,10 +42,10 @@ class M_comp_Hyper_Graph :public DirectedHyperGraph {
     ~M_comp_Hyper_Graph() {}
 
     inline std::list<HyperEdge*> inHyperEdge(Vertex * v) const {return vertexInHyperEdge[v->getId()];}
-    inline std::list<DirectedHyperEdge*> isHeadOf(Vertex * v) const {return headOfHyperEdge[v->getId()];}
+    inline EdgeList* isHeadOf(Vertex * v) const {return headOfHyperEdge[v->getId()];}
 
     void addHyperEdge(const HyperEdge& edge, Vertex * head);
-    void changeDirection(std::list<DirectedHyperEdge*>::iterator& edge, Vertex * to);
+    void changeDirection(EdgeList* edge, Vertex * to);
 
     std::vector<bool> getSameComponentVector(Vertex * v);
     void MakeMCompHypergraph(const SimpleGraph& G);
