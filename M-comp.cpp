@@ -23,9 +23,9 @@ void M_comp_Hyper_Graph::changeDirection(DirectedHyperEdge& edge, Vertex * to) {
 
 
 
-std::vector<bool> getSameComponentVector(int v, const M_comp_Hyper_Graph& HG) {
-    std::vector<bool> c_v(HG.getNumberOfNodes(), 0);
-    std::list<HyperEdge*> hyperEdges = HG.inHyperEdge(v);
+std::vector<bool> M_comp_Hyper_Graph::getSameComponentVector(Vertex * v) {
+    std::vector<bool> c_v(getNumberOfNodes(), 0);
+    std::list<HyperEdge*> hyperEdges = inHyperEdge(v);
     for (HyperEdge* hyperedge : hyperEdges) {
         for (const auto& vertex : hyperedge->getVertices()) {
             c_v[vertex->getId()] = true;
@@ -37,20 +37,16 @@ std::vector<bool> getSameComponentVector(int v, const M_comp_Hyper_Graph& HG) {
 
 
 
-DirectedHyperGraph CreateMCompHypergraph(const SimpleGraph& G, int k, int ell) {
-    DirectedHyperGraph * HGprime = new DirectedHyperGraph(G.getNumberOfNodes());
-    SimpleGraph GStar(G.getNumberOfNodes());  // max spanning sparse subgraph
-    if (G.getNumberOfEdges() == 0) {
-        return *HGprime;
-    } else {
-        SimpleGraph Gprime(G.getNumberOfNodes());
+void M_comp_Hyper_Graph::MakeMCompHypergraph(const SimpleGraph& G) {
+    if (G.getNumberOfEdges() != 0) {
+        SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
-            Vertex * v = HGprime->getVertex(i);
-            std::vector<bool> inTheSameM_componentWith_i = getSameComponentVector(v->getId(), *HGprime);  // c_i in the paper
+            Vertex * v = getVertex(i);
+            std::vector<bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
             std::vector<int> neighborIds = G.getNeighbors(v->getId());
 
             for (int neighborId : neighborIds) {
-                Vertex * neighbor = HGprime->getVertex(neighborId);
+                Vertex * neighbor = getVertex(neighborId);
                 int maxSumDegree = 2 * k - ell - 1;
 
                 if (v->getId() < neighbor->getId()) {  // not to add two times
@@ -59,9 +55,9 @@ DirectedHyperGraph CreateMCompHypergraph(const SimpleGraph& G, int k, int ell) {
                 if (inTheSameM_componentWith_i[neighbor->getId()])
                     continue;  // in this case, no action is needed
 
-                while (v->getInDegree() + neighbor-> getInDegree() > maxSumDegree) {
+                /*while (v->getInDegree() + neighbor-> getInDegree() > maxSumDegree) {
                     // BFS
-                    std::list<HyperEdge> * hyperEdges = HGprime->getUndirectedHyperEdges();
+                    std::list<HyperEdge> * hyperEdges = getUndirectedHyperEdges();
                     for (HyperEdge h : *hyperEdges) {
                         h.setUsedInThisDFS(false);
                     }
@@ -74,7 +70,7 @@ DirectedHyperGraph CreateMCompHypergraph(const SimpleGraph& G, int k, int ell) {
                         if (actualVertex->getInDegree() < k) {
                             
                         } else {
-                            std::list<DirectedHyperEdge*> canPropagate = HGprime->isHeadOf(actualVertex->getId());
+                            std::list<DirectedHyperEdge*> canPropagate = isHeadOf(actualVertex->getId());
                              for (DirectedHyperEdge* dirEdge : canPropagate) {
                                  if (!(dirEdge->getHyperEdge()->isUsedInThisDFS())) {
                                      // This can be used for transverse back
@@ -86,25 +82,22 @@ DirectedHyperGraph CreateMCompHypergraph(const SimpleGraph& G, int k, int ell) {
                             }
                         }
                     }
-                }
+                }*/
 
                 if (v->getInDegree() + neighbor-> getInDegree() <= maxSumDegree) {  // you can add one edge
                     HyperEdge * newHyperEgde = new HyperEdge({v, neighbor});
-                    GStar.addEdge(v->getId(), neighbor->getId());
+                    SpanningGraph.addEdge(v->getId(), neighbor->getId());
                     if (v->getInDegree() < neighbor->getInDegree()) {
-                        HGprime->addHyperEdge(*newHyperEgde, v);
+                        addHyperEdge(*newHyperEgde, v);
                     } else {
-                        HGprime->addHyperEdge(*newHyperEgde, neighbor);
+                        addHyperEdge(*newHyperEgde, neighbor);
                     }
                     continue;
-                } else {
+                } /*else {
                     // need to add new hyperedge by the seen vertices
-                }
-
-                
+                }  */
             }
         }
-        return *HGprime;
     }
 }
 
@@ -112,6 +105,6 @@ int main() {
     SimpleGraph G;
     G.readFromInput();
     M_comp_Hyper_Graph HG(G.getNumberOfNodes(), 2, 3);
-    HG.CreateMCompHypergraph(G);
+    HG.MakeMCompHypergraph(G);
     HG.print();
 }

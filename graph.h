@@ -140,7 +140,6 @@ class DirectedHyperGraph {
         std::list<HyperEdge> undirectedHyperEdges;
         size_t size;
 
-        
 
  public:
         DirectedHyperGraph() {}
@@ -156,7 +155,7 @@ class DirectedHyperGraph {
             for (size_t i = 0; i < size; i++) {
                 vertices.emplace_back(i);
             }
-            
+
             std::vector<Edge> graphEdges = G.getEdges();
 
             for (const auto& e : graphEdges) {
