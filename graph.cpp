@@ -12,38 +12,36 @@ void SimpleGraph::readFromInput() {
     }
 }
 
-/*void EdgeList::push_front(EdgeList** headRef, DirectedHyperEdge* new_data) {
-        EdgeList* new_node = new EdgeList();
-        new_node->edge = new_data;
-        new_node->next = (*headRef);
-        (*headRef) = new_node;
-}*/
 
-void EdgeList::push_front(EdgeList** headRef, DirectedHyperEdge* new_data) {
-    EdgeList* new_node = new EdgeList();
-    new_node->edge = new_data;
-    new_node->prev = NULL;
-    new_node->next = this;
-    if ((*headRef) != NULL)
-        (*headRef)->prev = new_node;
-    (*headRef) = new_node;
+
+template<typename T> void List<T>::push_front(T new_data) {
+    Node<T>* new_node = new Node<T>();
+    new_node->setData(new_data);
+    new_node->setPrevious(NULL);
+    new_node->setNext(first);
+    if (first != NULL)
+        first->setPrevious(new_node);
+    first = new_node;
+    numbOfData++;
 }
 
-void EdgeList::deleteNode(EdgeList** headRef, EdgeList* nodeToDelete) {
+template<typename T> void List<T>::deleteNode(Node<T>* nodeToDelete) {
     if (nodeToDelete == NULL)
         return;
-    if (*headRef == nodeToDelete)
-        *headRef = nodeToDelete->next;
+    if (first == nodeToDelete) {
+        first = nodeToDelete->getNext();
+    }
 
-    if (nodeToDelete->next != NULL)
-        nodeToDelete->next->prev = nodeToDelete->prev;
+    if (nodeToDelete->getNext() != NULL)
+        nodeToDelete->getNext()->setPrevious(nodeToDelete->getPrevious());
 
     /* Change prev only if node to be
     deleted is NOT the first node */
-    if (nodeToDelete->prev != NULL)
-        nodeToDelete->prev->next = nodeToDelete->next;
+    if (nodeToDelete->getPrevious() != NULL)
+        nodeToDelete->getPrevious()->setNext(nodeToDelete->getNext());
 
-    return;
+    delete nodeToDelete;
+    numbOfData--;
 }
 
 
@@ -89,3 +87,7 @@ void DirectedHyperGraph::readFromInput() {
     }
 }
 
+template class List<DirectedHyperEdge*>;
+template class Node<DirectedHyperEdge*>;
+template class List<HyperEdge*>;
+template class Node<HyperEdge*>;

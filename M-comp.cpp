@@ -3,41 +3,44 @@
 #include "graph.h"
 #include "M-comp.h"
 
-void M_comp_Hyper_Graph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
+void M_compHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
-    headOfHyperEdge[head->getId()]->push_front(&headOfHyperEdge[head->getId()], &directedHyperEdges.back());
+    List<DirectedHyperEdge*> head_of_list = head->isHeadOf();
+    head->isHeadOf().push_front(&directedHyperEdges.back());
     head->increaseInDegree();
 
     for (const auto& v : edge.getVertices()) {
-            vertexInHyperEdge[v->getId()].push_back(&undirectedHyperEdges.back());
+        auto head_of_list = v->inHyperEdge();
+        v->inHyperEdge().push_front(&undirectedHyperEdges.back());
     }
 }
 
-void M_comp_Hyper_Graph::changeDirection(EdgeList* edge, Vertex * to) {
-    DirectedHyperEdge * realEdge = edge->getEdge();
+void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge, Vertex * to) {
+    DirectedHyperEdge* realEdge = edge.getData();
     Vertex * from = realEdge->getHead();
     from->decreaseInDegree();
     realEdge->setHead(to);
-    headOfHyperEdge[to->getId()]->push_front(&headOfHyperEdge[to->getId()], realEdge);
+    to->isHeadOf().push_front(realEdge);
     to->increaseInDegree();
-    headOfHyperEdge[from->getId()]->deleteNode(&headOfHyperEdge[from->getId()], edge);//Ha egy pont van, akkor hogyan törlünk? 
+    from->isHeadOf().deleteNode(&edge);  //  Ha egy pont van, akkor hogyan törlünk?
 }
 
 
 
-std::vector<bool> M_comp_Hyper_Graph::getSameComponentVector(Vertex * v) {
+std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
     std::vector<bool> c_v(getNumberOfNodes(), 0);
-    std::list<HyperEdge*> hyperEdges = inHyperEdge(v);
-    for (HyperEdge* hyperedge : hyperEdges) {
-        for (const auto& vertex : hyperedge->getVertices()) {
+    Node<HyperEdge*>* hyperedge = v->inHyperEdge().getFirst();
+    while (hyperedge != NULL) {
+        for (const auto& vertex : hyperedge->getData()->getVertices()) {
             c_v[vertex->getId()] = true;
         }
+        hyperedge = hyperedge->getNext();
     }
     return c_v;
 }
 
-bool M_comp_Hyper_Graph::DFS(Vertex * v1, Vertex * v2) {
+bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
     /*
     Vertices that are used in this DFS form T(ij)
     */
@@ -52,10 +55,8 @@ bool M_comp_Hyper_Graph::DFS(Vertex * v1, Vertex * v2) {
     Q.push(v1);
     v1->setUsedInThisDFS(true);
 
-    
     Q.push(v2);
     v2->setUsedInThisDFS(true);
-    
 
     while (!Q.empty()) {
         Vertex * actualVertex = Q.front();
@@ -66,16 +67,16 @@ bool M_comp_Hyper_Graph::DFS(Vertex * v1, Vertex * v2) {
             // and return
             Vertex * v = actualVertex;
             do {
-                EdgeList* comeFrom = actualVertex->getFrom();
-                v = comeFrom->getEdge()->getHead();
+                Node<DirectedHyperEdge*> comeFrom = *actualVertex->getFrom().getFirst();
+                v = comeFrom.getData()->getHead();
                 changeDirection(comeFrom, actualVertex);
                 actualVertex = v;
             } while ( !((*actualVertex == *v1) || (*actualVertex == *v2)) );
             return true;
         } else {
-            EdgeList * nodeList = isHeadOf(actualVertex);
-            while (nodeList !=NULL) {
-                DirectedHyperEdge* dirEdge = nodeList->getEdge();
+            Node<DirectedHyperEdge*>* node = actualVertex->isHeadOf().getFirst();
+            while (node != NULL) {
+                DirectedHyperEdge* dirEdge = node->getData();
                 if (!dirEdge->getHyperEdge()->isUsedInThisDFS()) {
                      // This can be used for transverse back
                     std::vector<Vertex *> edgeVertices = dirEdge->getHyperEdge()->getVertices();
@@ -83,11 +84,12 @@ bool M_comp_Hyper_Graph::DFS(Vertex * v1, Vertex * v2) {
                         if (!newVert->isUsedInThisDFS()) {
                             Q.push(newVert);
                             newVert->setUsedInThisDFS(true);
-                            newVert->setIncomingHyperedge(nodeList);
+                            // newVert->setIncomingHyperedge(node);
+                            //TODO ez mi? 
                         }
                     }
                 }
-                nodeList = nodeList->getNext();
+                node = node->getNext();
             }
         }
     }
@@ -96,7 +98,7 @@ bool M_comp_Hyper_Graph::DFS(Vertex * v1, Vertex * v2) {
 
 
 
-void M_comp_Hyper_Graph::MakeMCompHypergraph(const SimpleGraph& G) {
+void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
     if (G.getNumberOfEdges() != 0) {
         SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
@@ -139,7 +141,7 @@ void M_comp_Hyper_Graph::MakeMCompHypergraph(const SimpleGraph& G) {
 int main() {
     SimpleGraph G;
     G.readFromInput();
-    M_comp_Hyper_Graph HG(G.getNumberOfNodes(), 2, 3);
+    M_compHyperGraph HG(G.getNumberOfNodes(), 2, 3);
     HG.MakeMCompHypergraph(G);
     HG.print();
 }

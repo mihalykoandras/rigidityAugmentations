@@ -5,6 +5,38 @@
 #include <list>
 #include <iostream>
 
+template<typename T>class Node;
+
+template<typename T>class Node{
+ private:
+    T data;
+    Node<T>* prev;
+    Node<T>* next;
+
+ public:
+    Node() {}
+    Node<T>* getNext() {return next;}
+    Node<T>* getPrevious() {return prev;}
+    void setNext(Node<T>* next_) {next = next_;}
+    void setPrevious(Node<T> * prev_) {prev = prev_;}
+    void setData(T data_) {data = data_;}
+    T getData() const {return data;}
+    void setNode(T data_) {data = data_;}
+};
+
+template<typename T>class List{
+ private:
+    Node<T>* first;
+    int numbOfData;
+
+ public:
+    List() {first = NULL; numbOfData = 0;}
+    void push_front(T new_data);
+    void deleteNode(Node<T>* nodeToDelete);
+    bool isEmpty() const {return numbOfData == 0;}
+    Node<T>* getFirst() {return first;}
+};
+
 
 struct Edge {
  private:
@@ -61,19 +93,20 @@ class SimpleGraph {
 
 class HyperEdge;
 class DirectedHyperEdge;
-class EdgeList;
+
 
 class Vertex {
  private:
         int id;
-        int inDegree;
-        bool printWithDegree;
         bool usedInDFS;
-        EdgeList* comeFrom;
+        int inDegree;
+        List<DirectedHyperEdge*> comeFrom;
+        List<HyperEdge*> undHyperEdges;
+        List <DirectedHyperEdge*> headOfHyperEdge;
 
  public:
         Vertex() {}
-        explicit Vertex(int id_):id(id_) {inDegree = 0; printWithDegree = false; usedInDFS = false;}
+        explicit Vertex(int id_):id(id_) {inDegree = 0; usedInDFS = false;}
         ~Vertex() {}
 
         inline int getId() const {return id;}
@@ -87,16 +120,15 @@ class Vertex {
         inline void increaseInDegree() {inDegree++;}
         inline bool isUsedInThisDFS() const {return usedInDFS;}
         inline void setUsedInThisDFS(bool used) {usedInDFS = used;}
-        inline EdgeList* getFrom() {return comeFrom;}
-        inline void setIncomingHyperedge(EdgeList* from) {comeFrom = from;}
+        inline List<DirectedHyperEdge*> getFrom() {return comeFrom;}
+        inline void setIncomingHyperedge(List<DirectedHyperEdge*> from) {comeFrom = from;}
+        inline List<HyperEdge*> inHyperEdge() const {return undHyperEdges;}
+        inline List<DirectedHyperEdge*> isHeadOf() const {return headOfHyperEdge;}
 
 
         inline void print() const {
-            if (printWithDegree)
-                std::cout << "Id: " << id << " d: " << inDegree;
-            else
                 std::cout << id;
-            }
+        }
 };
 
 class HyperEdge {
@@ -140,21 +172,6 @@ class DirectedHyperEdge {
             std::cout << "Hyperedge: ";
             hyperEdge->print();
         }
-};
-
-class EdgeList{
- private:
-    DirectedHyperEdge* edge;
-    EdgeList* prev;
-    EdgeList* next;
-
- public:
-    EdgeList() {}
-    void push_front(EdgeList** headRef, DirectedHyperEdge* new_data);
-    void deleteNode(EdgeList** headRef, EdgeList* nodeToDelete);
-    EdgeList* getNext() {return next;}
-    DirectedHyperEdge* getEdge() const {return edge;}
-    void setEdge(DirectedHyperEdge* edge_) {edge = edge_;}
 };
 
 class DirectedHyperGraph {
