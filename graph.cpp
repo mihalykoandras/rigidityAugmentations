@@ -12,39 +12,6 @@ void SimpleGraph::readFromInput() {
     }
 }
 
-
-
-template<typename T> void List<T>::push_front(T new_data) {
-    Node<T>* new_node = new Node<T>();
-    new_node->setData(new_data);
-    new_node->setPrevious(NULL);
-    new_node->setNext(first);
-    if (first != NULL)
-        first->setPrevious(new_node);
-    first = new_node;
-    numbOfData++;
-}
-
-template<typename T> void List<T>::deleteNode(Node<T>* nodeToDelete) {
-    if (nodeToDelete == NULL)
-        return;
-    if (first == nodeToDelete) {
-        first = nodeToDelete->getNext();
-    }
-
-    if (nodeToDelete->getNext() != NULL)
-        nodeToDelete->getNext()->setPrevious(nodeToDelete->getPrevious());
-
-    /* Change prev only if node to be
-    deleted is NOT the first node */
-    if (nodeToDelete->getPrevious() != NULL)
-        nodeToDelete->getPrevious()->setNext(nodeToDelete->getNext());
-
-    delete nodeToDelete;
-    numbOfData--;
-}
-
-
 void DirectedHyperGraph::print() const {
     std::cout << "Number of Nodes: " << getNumberOfNodes() << std::endl;
     std::cout << "Edges:" << std::endl;
@@ -87,7 +54,4 @@ void DirectedHyperGraph::readFromInput() {
     }
 }
 
-template class List<DirectedHyperEdge*>;
-template class Node<DirectedHyperEdge*>;
-template class List<HyperEdge*>;
-template class Node<HyperEdge*>;
+

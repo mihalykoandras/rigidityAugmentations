@@ -5,8 +5,6 @@
 #include <list>
 #include <iostream>
 
-template<typename T>class Node;
-
 template<typename T>class Node{
  private:
     T data;
@@ -36,6 +34,36 @@ template<typename T>class List{
     bool isEmpty() const {return numbOfData == 0;}
     Node<T>* getFirst() {return first;}
 };
+
+template<typename T> void List<T>::push_front(T new_data) {
+    Node<T>* new_node = new Node<T>();
+    new_node->setData(new_data);
+    new_node->setPrevious(NULL);
+    new_node->setNext(first);
+    if (first != NULL)
+        first->setPrevious(new_node);
+    first = new_node;
+    numbOfData++;
+}
+
+
+template<typename T> void List<T>::deleteNode(Node<T>* nodeToDelete) {
+    if (nodeToDelete == NULL)
+        return;
+    if (nodeToDelete->getData() == first->getData()) {  // delete the first
+        first = nodeToDelete->getNext();
+    }
+
+    if (nodeToDelete->getNext() != NULL)
+        nodeToDelete->getNext()->setPrevious(nodeToDelete->getPrevious());
+
+    /* Change prev only if node to be
+    deleted is NOT the first node */
+    if (nodeToDelete->getPrevious() != NULL)
+        nodeToDelete->getPrevious()->setNext(nodeToDelete->getNext());
+
+    numbOfData--;
+}
 
 
 struct Edge {
@@ -96,11 +124,14 @@ class DirectedHyperEdge;
 
 
 class Vertex {
+    /* Highly speciliazed Vertex class. Contains the edges that it is a head of, 
+    undirected hyperedges that contains it, and also the data for the DFS. 
+     */
  private:
         int id;
         bool usedInDFS;
         int inDegree;
-        List<DirectedHyperEdge*> comeFrom;
+        Node<DirectedHyperEdge*> comeFrom;
         List<HyperEdge*> undHyperEdges;
         List <DirectedHyperEdge*> headOfHyperEdge;
 
@@ -120,10 +151,10 @@ class Vertex {
         inline void increaseInDegree() {inDegree++;}
         inline bool isUsedInThisDFS() const {return usedInDFS;}
         inline void setUsedInThisDFS(bool used) {usedInDFS = used;}
-        inline List<DirectedHyperEdge*> getFrom() {return comeFrom;}
-        inline void setIncomingHyperedge(List<DirectedHyperEdge*> from) {comeFrom = from;}
-        inline List<HyperEdge*> inHyperEdge() const {return undHyperEdges;}
-        inline List<DirectedHyperEdge*> isHeadOf() const {return headOfHyperEdge;}
+        inline Node<DirectedHyperEdge*> getFrom() {return comeFrom;}
+        inline void setIncomingHyperedge(Node<DirectedHyperEdge*> from) {comeFrom = from;}
+        inline List<HyperEdge*>* inHyperEdge() {return &undHyperEdges;}
+        inline List<DirectedHyperEdge*>* isHeadOf() {return &headOfHyperEdge;}
 
 
         inline void print() const {

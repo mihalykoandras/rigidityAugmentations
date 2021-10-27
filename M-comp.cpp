@@ -4,34 +4,39 @@
 #include "M-comp.h"
 
 void M_compHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
+    /* Ads undirected hyperedge every time if it encounters for every "inHypereedge"
+    Might be too much, as in hyperedge will be d(G) for every v.
+    */
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
-    List<DirectedHyperEdge*> head_of_list = head->isHeadOf();
-    head->isHeadOf().push_front(&directedHyperEdges.back());
+    List<DirectedHyperEdge*> head_of_list = *head->isHeadOf();
+    head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
 
     for (const auto& v : edge.getVertices()) {
-        auto head_of_list = v->inHyperEdge();
-        v->inHyperEdge().push_front(&undirectedHyperEdges.back());
+        v->inHyperEdge()->push_front(&undirectedHyperEdges.back());
     }
 }
 
-void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge, Vertex * to) {
-    DirectedHyperEdge* realEdge = edge.getData();
-    Vertex * from = realEdge->getHead();
-    from->decreaseInDegree();
-    realEdge->setHead(to);
-    to->isHeadOf().push_front(realEdge);
+void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge
+/*comes from the list head->isHeadOf*/, Vertex * to) {
+    DirectedHyperEdge* newEdge = edge.getData();
+    Vertex * from = newEdge->getHead();
+    newEdge->setHead(to);
+
+    to->isHeadOf()->push_front(newEdge);
     to->increaseInDegree();
-    from->isHeadOf().deleteNode(&edge);  //  Ha egy pont van, akkor hogyan törlünk?
+
+    from->decreaseInDegree();
+    from->isHeadOf()->deleteNode(&edge);  //  Ha egy pont van, akkor hogyan törlünk?
 }
 
 
 
 std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
     std::vector<bool> c_v(getNumberOfNodes(), 0);
-    Node<HyperEdge*>* hyperedge = v->inHyperEdge().getFirst();
-    while (hyperedge != NULL) {
+    Node<HyperEdge*>* hyperedge = v->inHyperEdge()->getFirst();
+    while (hyperedge != NULL) {  // TODO  Mivel az inHyperEdge többször is tartalmazhat u.a-t, ezért ez nem O(V^2)
         for (const auto& vertex : hyperedge->getData()->getVertices()) {
             c_v[vertex->getId()] = true;
         }
@@ -62,19 +67,18 @@ bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
         Vertex * actualVertex = Q.front();
         Q.pop();
         if (!(*actualVertex == *v1 || *actualVertex == *v2) &&
-            actualVertex->getInDegree() < k) {
-            // turn around
-            // and return
+            actualVertex->getInDegree() < k) {  // actual vertex is correct, so
+            // turn around and return
             Vertex * v = actualVertex;
             do {
-                Node<DirectedHyperEdge*> comeFrom = *actualVertex->getFrom().getFirst();
+                Node<DirectedHyperEdge*> comeFrom = actualVertex->getFrom();
                 v = comeFrom.getData()->getHead();
                 changeDirection(comeFrom, actualVertex);
                 actualVertex = v;
             } while ( !((*actualVertex == *v1) || (*actualVertex == *v2)) );
             return true;
         } else {
-            Node<DirectedHyperEdge*>* node = actualVertex->isHeadOf().getFirst();
+            Node<DirectedHyperEdge*>* node = actualVertex->isHeadOf()->getFirst();
             while (node != NULL) {
                 DirectedHyperEdge* dirEdge = node->getData();
                 if (!dirEdge->getHyperEdge()->isUsedInThisDFS()) {
@@ -82,10 +86,9 @@ bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
                     std::vector<Vertex *> edgeVertices = dirEdge->getHyperEdge()->getVertices();
                     for (Vertex* newVert : edgeVertices) {
                         if (!newVert->isUsedInThisDFS()) {
-                            Q.push(newVert);
                             newVert->setUsedInThisDFS(true);
-                            // newVert->setIncomingHyperedge(node);
-                            //TODO ez mi? 
+                            newVert->setIncomingHyperedge(*node);
+                            Q.push(newVert);
                         }
                     }
                 }
