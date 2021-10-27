@@ -21,6 +21,15 @@ void DirectedHyperGraph::print() const {
     }
 }
 
+void DirectedHyperEdge::changeUnderlyingEdge(HyperEdge* newHyperEdge) {
+    hyperEdge = newHyperEdge;
+
+    for (const auto& v : hyperEdge->getVertices()) {  // TODO: no change, just added. Is it O(|V|^2)?
+        v->inHyperEdge()->push_front(newHyperEdge);
+    }
+}
+
+
 void DirectedHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());

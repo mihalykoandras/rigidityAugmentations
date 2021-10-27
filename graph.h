@@ -195,6 +195,7 @@ class DirectedHyperEdge {
         inline Vertex * getHead() const {return head;}
         inline void setHead(Vertex* v) {head = v;}
         inline HyperEdge * getHyperEdge() {return hyperEdge;}
+        void changeUnderlyingEdge(HyperEdge* hyperEdge_);
 
         inline void print() const {
             std::cout << "Head: ";

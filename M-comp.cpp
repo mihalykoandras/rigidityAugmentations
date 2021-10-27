@@ -83,6 +83,7 @@ bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
                 DirectedHyperEdge* dirEdge = node->getData();
                 if (!dirEdge->getHyperEdge()->isUsedInThisDFS()) {
                      // This can be used for transverse back
+                    dirEdge->getHyperEdge()->setUsedInThisDFS(true);
                     std::vector<Vertex *> edgeVertices = dirEdge->getHyperEdge()->getVertices();
                     for (Vertex* newVert : edgeVertices) {
                         if (!newVert->isUsedInThisDFS()) {
@@ -150,9 +151,15 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
                         addHyperEdge(*newHyperEgde, neighbor);
                     }
                     continue;
-                } /*else {
-                    // need to add new hyperedge by the seen vertices
-                }  */
+                } else {
+                    undirectedHyperEdges.emplace_back(T);
+                    HyperEdge * newHyperEgde = &undirectedHyperEdges.back();
+                    for (DirectedHyperEdge& hyperEdge : directedHyperEdges) {
+                        if (hyperEdge.getHyperEdge()->isUsedInThisDFS()) {
+                            hyperEdge.changeUnderlyingEdge(newHyperEgde);
+                        }
+                    }
+                }
             }
         }
     }
@@ -161,7 +168,7 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
 int main() {
     SimpleGraph G;
     G.readFromInput();
-    M_compHyperGraph HG(G.getNumberOfNodes(), 2, 3);
+    M_compHyperGraph HG(G.getNumberOfNodes(), 1, 1);
     HG.MakeMCompHypergraph(G);
     HG.print();
 }
