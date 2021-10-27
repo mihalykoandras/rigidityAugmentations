@@ -34,7 +34,7 @@ void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge
 
 
 std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
-    std::vector<bool> c_v(getNumberOfNodes(), 0);
+    std::vector<bool> c_v(getNumberOfVertices(), 0);
     Node<HyperEdge*>* hyperedge = v->inHyperEdge()->getFirst();
     while (hyperedge != NULL) {  // TODO  Mivel az inHyperEdge többször is tartalmazhat u.a-t, ezért ez nem O(V^2)
         for (const auto& vertex : hyperedge->getData()->getVertices()) {
@@ -99,6 +99,27 @@ bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
     return false;
 }
 
+std::vector<Vertex *> M_compHyperGraph::getT(Vertex * v1, Vertex * v2) {
+    std::vector<Vertex *> T(0);
+    int maxSumDegree = 2 * k - ell - 1;
+
+    bool hasEdgeToChange;
+    do {
+        hasEdgeToChange = DFS(v1, v2);
+    } while ((v1->getInDegree() + v2-> getInDegree() > maxSumDegree) && hasEdgeToChange);
+
+    if (v1->getInDegree() + v2-> getInDegree() <= maxSumDegree) {
+        return T;
+    } else {
+        for (Vertex& v : vertices) {
+            if (v.isUsedInThisDFS()) {
+                T.push_back(&v);
+            }
+        }
+    }
+    return T;
+}
+
 
 
 void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
@@ -111,7 +132,6 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
 
             for (int neighborId : neighborIds) {
                 Vertex * neighbor = getVertex(neighborId);
-                int maxSumDegree = 2 * k - ell - 1;
 
                 if (v->getId() < neighbor->getId()) {  // not to add two times
                     Gprime.addEdge(v->getId(), neighbor->getId());
@@ -119,12 +139,9 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
                 if (inTheSameM_componentWith_i[neighbor->getId()])
                     continue;  // in this case, no action is needed
 
-                bool hasEdgeToChange = true;
-                while (v->getInDegree() + neighbor-> getInDegree() > maxSumDegree & hasEdgeToChange) {
-                    hasEdgeToChange = DFS(v, neighbor);
-                }
+                std::vector<Vertex *> T = getT(v, neighbor);
 
-                if (v->getInDegree() + neighbor-> getInDegree() <= maxSumDegree) {  // you can add one edge
+                if (T.empty()) {  // you can add one edge
                     HyperEdge * newHyperEgde = new HyperEdge({v, neighbor});
                     SpanningGraph.addEdge(v->getId(), neighbor->getId());
                     if (v->getInDegree() < neighbor->getInDegree()) {

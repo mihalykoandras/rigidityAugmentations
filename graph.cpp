@@ -13,7 +13,8 @@ void SimpleGraph::readFromInput() {
 }
 
 void DirectedHyperGraph::print() const {
-    std::cout << "Number of Nodes: " << getNumberOfNodes() << std::endl;
+    std::cout << "Number of vertices: " << getNumberOfVertices() << std::endl;
+    std::cout << "Number of hyperedges: " << getNumberOfEdges() << std::endl;
     std::cout << "Edges:" << std::endl;
     for (auto const& e : directedHyperEdges) {
         e.print();
@@ -43,7 +44,7 @@ void DirectedHyperGraph::readFromInput() {
         int v;
         std::cin >> v;
 
-        while (v >= 0 && v < getNumberOfNodes()) {
+        while (v >= 0 && v < getNumberOfVertices()) {
             edgeVertices.push_back(&vertices[v]);
             if (h == -1)  // Hack to store head
                 h = v;

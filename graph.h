@@ -251,7 +251,9 @@ class DirectedHyperGraph {
         }
 
         ~DirectedHyperGraph() {}
-        inline size_t getNumberOfNodes() const {return size;}
+        inline size_t getNumberOfVertices() const {return size;}
+        inline size_t getNumberOfEdges() const {return directedHyperEdges.size();}
+
 
         inline Vertex * getVertex(int i) {return &vertices[i];}
         inline std::list<HyperEdge> * getUndirectedHyperEdges() {return &undirectedHyperEdges;}

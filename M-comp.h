@@ -43,5 +43,6 @@ class M_compHyperGraph : public DirectedHyperGraph {
     std::vector<bool> getSameComponentVector(Vertex * v);
     void MakeMCompHypergraph(const SimpleGraph& G);
     bool DFS(Vertex * v1, Vertex * v2);
+    std::vector<Vertex*> getT(Vertex * v1, Vertex * v2);
 };
 #endif  // M_COMP_H_
