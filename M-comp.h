@@ -14,9 +14,14 @@ class M_compHyperGraph : public DirectedHyperGraph {
     int ell;
     SimpleGraph SpanningGraph;
 
-
-    bool threeInTwo(std::vector<Vertex* >& T1, std::vector<Vertex* >& T2, std::vector<Vertex* >& T3,
-    std::vector<Vertex* >& L1, std::vector<Vertex* >& L2) const;
+    std::vector<bool> getSameComponentVector(Vertex * v);
+    bool DFS(Vertex * v1, Vertex * v2);
+    Vertex * findLowDegreeVertex();
+    void markOneTight(Vertex * head, Vertex * j);
+    bool isWholeSized(const std::vector<Vertex* >& V) const {return V.size() == size;}
+    std::vector<Vertex*> StarSearch(Vertex * i, std::vector<Vertex*> L);
+    bool threeInTwo(const std::vector<Vertex* >& T1, const std::vector<Vertex* >& T2, const std::vector<Vertex* >& T3,
+    const std::vector<Vertex* >& L1, const std::vector<Vertex* >& L2) const;
 
  public:
     M_compHyperGraph(size_t n, unsigned int k_, int ell_) {
@@ -43,18 +48,13 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
     void addHyperEdge(const HyperEdge& edge, Vertex * head);  // never used
     void addDirEdge(Vertex * head, Vertex * tail);
-
     void changeDirection(Node<DirectedHyperEdge*> edge, Vertex * to);
 
-    std::vector<bool> getSameComponentVector(Vertex * v);
-    void MakeMCompHypergraph(const SimpleGraph& G);
-    bool DFS(Vertex * v1, Vertex * v2);
     std::vector<Vertex*> getT(Vertex * v1, Vertex * v2);
-    std::vector<Vertex*> StarSearch(Vertex * i, std::vector<Vertex*> L);
-    void markOneTight(Vertex * head, Vertex * j);
+    void MakeMCompHypergraph(const SimpleGraph& G);
     std::vector<Vertex *> findTransversal(std::vector<Vertex *> L);
-    Vertex * findLowDegreeVertex();
-    bool isWholeSized(const std::vector<Vertex* >& V) const {return V.size() == size;}
     std::vector<Edge> toRedund();
+
+    void print() const;
 };
 #endif  // M_COMP_H_

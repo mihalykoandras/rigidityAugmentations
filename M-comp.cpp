@@ -3,6 +3,11 @@
 #include "graph.h"
 #include "M-comp.h"
 
+void M_compHyperGraph::print() const {
+    std::cout << "(k, ell) = (" << k <<", " << ell << ")" << std::endl;
+    DirectedHyperGraph::print();
+}
+
 void M_compHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
     /* 
     Ads undirected hyperedge every time if it encounters for every "inMcomp"
@@ -255,8 +260,9 @@ std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L 
     return P;
 }
 
-bool M_compHyperGraph::threeInTwo(std::vector<Vertex* >& T1, std::vector<Vertex* >& T2, std::vector<Vertex* >& T3,
-    std::vector<Vertex* >& L1, std::vector<Vertex* >& L2) const {  // O(|V|)
+bool M_compHyperGraph::threeInTwo(
+    const std::vector<Vertex* >& T1, const std::vector<Vertex* >& T2, const std::vector<Vertex* >& T3,
+    const std::vector<Vertex* >& L1, const std::vector<Vertex* >& L2) const {  // O(|V|)
         std::vector<bool> isIn(getNumberOfVertices(), false);
         for (Vertex * v : L1) {
             isIn[v->getId()] = true;
@@ -328,10 +334,15 @@ std::vector<Edge> M_compHyperGraph::toRedund() {
 
 
 
-int main() {
+int main(int argc, char *argv[]) {
+    int k = 1;
+    int ell = 1;
+    if (argc > 1) {
+        std::cout << argv[1] <<std::endl;
+    }
     SimpleGraph G;
     G.readFromInput();
-    M_compHyperGraph HG(G.getNumberOfNodes(), 1, 1);
+    M_compHyperGraph HG(G.getNumberOfNodes(), k, ell);
     HG.MakeMCompHypergraph(G);
     HG.print();
     std::vector<Vertex *> P = HG.findTransversal();
@@ -341,6 +352,7 @@ int main() {
          std::cout << " ";
     }
     std::cout << "\n";
+    std::cout << "Optimal redund augmentation\n";
     std::vector<Edge> F = HG.toRedund();
     for (Edge& f : F) {
         f.print();
