@@ -217,6 +217,24 @@ std::vector<Vertex *> M_compHyperGraph::StarSearch(Vertex * i, std::vector<Verte
     return P;
 }
 
+Vertex * M_compHyperGraph::findLowDegreeVertex() {
+    std::vector<int> degree(getNumberOfVertices(), 0);
+    for (auto& edge : SpanningGraph.getEdges()) {
+        degree[edge.getEdge()[0]]++;
+        degree[edge.getEdge()[1]]++;
+    }
+
+    int i = 0;
+    while (degree[i] >= 2 * k) {i++;}
+    return getVertex(i);
+}
+
+
+std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L = std::vector<Vertex *>()) {
+    Vertex * i = findLowDegreeVertex();
+    
+}
+
 
 
 int main() {

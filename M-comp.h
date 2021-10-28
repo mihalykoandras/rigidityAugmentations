@@ -48,5 +48,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
     std::vector<Vertex*> getT(Vertex * v1, Vertex * v2);
     std::vector<Vertex*> StarSearch(Vertex * i, std::vector<Vertex*> L);
     void markOneTight(Vertex * head, Vertex * j);
+    std::vector<Vertex *> findTransversal(std::vector<Vertex *> L);
+    Vertex * findLowDegreeVertex();
 };
 #endif  // M_COMP_H_
