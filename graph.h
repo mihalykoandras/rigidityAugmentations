@@ -131,13 +131,20 @@ class Vertex {
         int id;
         bool usedInDFS;
         int inDegree;
+        bool mark, usedForStar;
         Node<DirectedHyperEdge*> comeFrom;
         List<HyperEdge*> undHyperEdges;
         List <DirectedHyperEdge*> headOfHyperEdge;
 
  public:
         Vertex() {}
-        explicit Vertex(int id_):id(id_) {inDegree = 0; usedInDFS = false;}
+        explicit Vertex(int id_):id(id_) {
+            inDegree = 0;
+            usedInDFS = false;
+            mark = false;
+            usedForStar = false;
+        }
+
         ~Vertex() {}
 
         inline int getId() const {return id;}
@@ -151,6 +158,10 @@ class Vertex {
         inline void increaseInDegree() {inDegree++;}
         inline bool isUsedInThisDFS() const {return usedInDFS;}
         inline void setUsedInThisDFS(bool used) {usedInDFS = used;}
+        inline bool isMarked() const {return mark;}
+        inline void setMark(bool flag) {mark = flag;}
+        inline bool isUsedForStar() const {return usedForStar;}
+        inline void setUsedForStar(bool flag) {usedForStar = flag;}
         inline Node<DirectedHyperEdge*> getFrom() {return comeFrom;}
         inline void setIncomingHyperedge(Node<DirectedHyperEdge*> from) {comeFrom = from;}
         inline List<HyperEdge*>* inMcomp() {return &undHyperEdges;}

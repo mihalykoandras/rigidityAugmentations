@@ -176,10 +176,60 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
     }
 }
 
+void M_compHyperGraph::markOneTight(Vertex * head, Vertex * j) {
+    std::vector<Vertex *> Tij = getT(head, j);
+    for (Vertex* v : Tij) {
+        v->setMark(true);
+        v->setUsedForStar(false);
+    }
+    j->setUsedForStar(true);
+}
+
+
+std::vector<Vertex *> M_compHyperGraph::StarSearch(Vertex * i, std::vector<Vertex *> L = std::vector<Vertex *>()) {
+    /*
+        Algorithm 4.4 in the paper
+        O(|V|^2)
+    */
+    for (Vertex v : vertices) {
+        v.setMark(false);
+        v.setUsedForStar(false);
+    }
+
+    i->setMark(true);
+    for (Vertex* j : L) {
+        if (!j->isMarked()) {
+            markOneTight(i, j);
+        }
+    }
+
+    for (Vertex& v : vertices) {
+        if (!v.isMarked()) {
+            markOneTight(i, &v);
+        }
+    }
+    std::vector<Vertex *> P(0);
+     for (Vertex& v : vertices) {
+        if (v.isUsedForStar()) {
+            P.push_back(&v);
+        }
+    }
+    return P;
+}
+
+
+
 int main() {
     SimpleGraph G;
     G.readFromInput();
-    M_compHyperGraph HG(G.getNumberOfNodes(), 2, 3);
+    M_compHyperGraph HG(G.getNumberOfNodes(), 1, 1);
     HG.MakeMCompHypergraph(G);
     HG.print();
+    std::vector<Vertex *> P(HG.StarSearch(HG.getVertex(0)));
+    std::cout << "Vertices in P\n";
+    for (Vertex * v : P) {
+         v->print();
+         std::cout << " ";
+    }
+    std::cout << "\n";
 }

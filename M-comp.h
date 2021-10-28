@@ -46,5 +46,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
     void MakeMCompHypergraph(const SimpleGraph& G);
     bool DFS(Vertex * v1, Vertex * v2);
     std::vector<Vertex*> getT(Vertex * v1, Vertex * v2);
+    std::vector<Vertex*> StarSearch(Vertex * i, std::vector<Vertex*> L);
+    void markOneTight(Vertex * head, Vertex * j);
 };
 #endif  // M_COMP_H_
