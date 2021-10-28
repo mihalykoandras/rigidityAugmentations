@@ -60,9 +60,6 @@ std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
 }
 
 bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
-    /*
-    Vertices that are used in this DFS form T(ij)
-    */
     for (HyperEdge& h : undirectedHyperEdges) {  // O(n)
         h.setUsedInThisDFS(false);
     }

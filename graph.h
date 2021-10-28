@@ -166,7 +166,8 @@ class HyperEdge {
  protected:
         std::vector<Vertex*> vertices;
         bool usedInThisDFS;
-        bool stillExistsing;
+        bool stillExistsing;  // we don't delete the hyperedges that are now part of a bigger M-comp,
+                              // just note that they are not useful any more
  public:
         explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {
             usedInThisDFS = false; stillExistsing = true;}

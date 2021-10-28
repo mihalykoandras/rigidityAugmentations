@@ -25,7 +25,8 @@ void DirectedHyperEdge::changeUnderlyingEdge(HyperEdge* newHyperEdge) {
     hyperEdge->setStillExistsing(false);
     newHyperEdge->setStillExistsing(true);
     hyperEdge = newHyperEdge;
-    for (const auto& v : hyperEdge->getVertices()) {  // It is still O(|V|^2), as at most double to amount of hyperedges can occur
+    for (const auto& v : hyperEdge->getVertices()) {
+        // It is still O(|V|^2), as it is at most double the amount of hyperedges can occur
         v->inMcomp()->push_front(newHyperEdge);
     }
 }
