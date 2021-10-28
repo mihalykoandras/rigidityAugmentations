@@ -46,10 +46,13 @@ class M_compHyperGraph : public DirectedHyperGraph {
     ~M_compHyperGraph() {}
 
 
+
+
     void addHyperEdge(const HyperEdge& edge, Vertex * head);  // never used
     void addDirEdge(Vertex * head, Vertex * tail);
     void changeDirection(Node<DirectedHyperEdge*> edge, Vertex * to);
 
+    bool isRigid() const {return SpanningGraph.getEdges().size() == k* getNumberOfVertices() - ell;}
     std::vector<Vertex*> getT(Vertex * v1, Vertex * v2);
     void MakeMCompHypergraph(const SimpleGraph& G);
     std::vector<Vertex *> findTransversal(std::vector<Vertex *> L);

@@ -236,6 +236,7 @@ Vertex * M_compHyperGraph::findLowDegreeVertex() {
 
 
 std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L = std::vector<Vertex *>()) {
+    if (isRigid()) {
     Vertex * i = findLowDegreeVertex();
     std::vector<Vertex *> ViL = StarSearch(i, L);
     if (ViL.size() == 1) {
@@ -258,6 +259,10 @@ std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L 
         std::cerr << "Too small transversal" << std::endl;
     }
     return P;
+    } else {
+        std::cerr << "G is not rigid" <<std::endl;
+        return  std::vector<Vertex *>();
+    }
 }
 
 bool M_compHyperGraph::threeInTwo(
@@ -291,6 +296,7 @@ std::vector<Edge> M_compHyperGraph::toRedund() {
         std::cerr << "Too few vertices" << std::endl;
         return std::vector<Edge>();
     }
+    if (isRigid()) {
     std::vector<Vertex *> P = findTransversal();
     if (P.size() < 2) {
         return std::vector<Edge>();
@@ -330,16 +336,28 @@ std::vector<Edge> M_compHyperGraph::toRedund() {
         F.emplace_back(P[0]->getId(), P[2]->getId());
     }
     return F;
+    } else {
+        std::cerr << "G is not rigid" <<std::endl;
+        return std::vector<Edge>();
+    }
 }
 
 
 
 int main(int argc, char *argv[]) {
-    int k = 1;
+    unsigned int k = 1;
     int ell = 1;
     if (argc > 1) {
-        std::cout << argv[1] <<std::endl;
+        if (atoi(argv[1]) > 0) {
+            k = atoi(argv[1]);
+        } else {
+            std::cerr << "k is not correct" << std::endl;
+        }
     }
+    if (argc > 2) {
+            ell = atoi(argv[2]);
+    }
+
     SimpleGraph G;
     G.readFromInput();
     M_compHyperGraph HG(G.getNumberOfNodes(), k, ell);
