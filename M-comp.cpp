@@ -191,7 +191,7 @@ std::vector<Vertex *> M_compHyperGraph::StarSearch(Vertex * i, std::vector<Verte
         Algorithm 4.4 in the paper
         O(|V|^2)
     */
-    for (Vertex v : vertices) {
+    for (Vertex& v : vertices) {
         v.setMark(false);
         v.setUsedForStar(false);
     }
@@ -232,7 +232,24 @@ Vertex * M_compHyperGraph::findLowDegreeVertex() {
 
 std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L = std::vector<Vertex *>()) {
     Vertex * i = findLowDegreeVertex();
-    
+    std::vector<Vertex *> ViL = StarSearch(i, L);
+    if (ViL.size() == 1) {
+        ViL.push_back(i);
+        return ViL;
+    }
+    if (ViL.size() == 2) {
+        for (Vertex& v : vertices) {
+            if (isWholeSized(getT(ViL[0], &v))) {
+                return std::vector<Vertex *>{ViL[0], &v};
+            }
+            if (isWholeSized(getT(ViL[1], &v))) {
+                return std::vector<Vertex *>{ViL[1], &v};
+            }
+        }
+    }
+    std::vector<Vertex *> P = StarSearch(ViL[0], L);
+    P.push_back(ViL[0]);
+    return P;
 }
 
 
@@ -240,10 +257,10 @@ std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L 
 int main() {
     SimpleGraph G;
     G.readFromInput();
-    M_compHyperGraph HG(G.getNumberOfNodes(), 1, 1);
+    M_compHyperGraph HG(G.getNumberOfNodes(), 2, 3);
     HG.MakeMCompHypergraph(G);
     HG.print();
-    std::vector<Vertex *> P(HG.StarSearch(HG.getVertex(0)));
+    std::vector<Vertex *> P = HG.findTransversal();
     std::cout << "Vertices in P\n";
     for (Vertex * v : P) {
          v->print();

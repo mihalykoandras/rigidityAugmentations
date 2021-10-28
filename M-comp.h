@@ -50,5 +50,6 @@ class M_compHyperGraph : public DirectedHyperGraph {
     void markOneTight(Vertex * head, Vertex * j);
     std::vector<Vertex *> findTransversal(std::vector<Vertex *> L);
     Vertex * findLowDegreeVertex();
+    bool isWholeSized(const std::vector<Vertex* >& V) const {return V.size() == size;}
 };
 #endif  // M_COMP_H_
