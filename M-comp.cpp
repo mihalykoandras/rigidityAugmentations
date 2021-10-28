@@ -311,14 +311,6 @@ std::vector<Edge> M_compHyperGraph::toRedund() {
         std::vector<Vertex* > T_1_h1 = getT(i_1, i_h1);
         std::vector<Vertex* > T_1_h = getT(i_1, i_h);
         std::vector<Vertex* > T_h_h1 = getT(i_h, i_h1);
-        /* std::vector<Vertex* > T_h_h2 = getT(i_h, i_h2);
-        std::vector<Vertex* > T_h1_h2 = getT(i_h1, i_h2);
-
-
-        std::cout << "Melyik jo \n";
-        std::cout << "1_h, h1_h2: " << threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h, T_h1_h2)<< "\n";
-        std::cout << "1_h1, h_h2: " << threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h1, T_h_h2)<< "\n";
-        std::cout << "1_h2, h_h1: " << threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h2, T_h_h1)<< "\n"; */
 
         if (threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h2, T_h_h1)) {
             F.emplace_back(i_h1->getId(), i_h->getId());
@@ -347,15 +339,13 @@ std::vector<Edge> M_compHyperGraph::toRedund() {
 int main(int argc, char *argv[]) {
     unsigned int k = 1;
     int ell = 1;
-    if (argc > 1) {
+    if (argc == 3) {
         if (atoi(argv[1]) > 0) {
             k = atoi(argv[1]);
+            ell = atoi(argv[2]);
         } else {
             std::cerr << "k is not correct" << std::endl;
         }
-    }
-    if (argc > 2) {
-            ell = atoi(argv[2]);
     }
 
     SimpleGraph G;
