@@ -153,7 +153,7 @@ class Vertex {
         inline void setUsedInThisDFS(bool used) {usedInDFS = used;}
         inline Node<DirectedHyperEdge*> getFrom() {return comeFrom;}
         inline void setIncomingHyperedge(Node<DirectedHyperEdge*> from) {comeFrom = from;}
-        inline List<HyperEdge*>* inHyperEdge() {return &undHyperEdges;}
+        inline List<HyperEdge*>* inMcomp() {return &undHyperEdges;}
         inline List<DirectedHyperEdge*>* isHeadOf() {return &headOfHyperEdge;}
 
 
@@ -166,8 +166,10 @@ class HyperEdge {
  protected:
         std::vector<Vertex*> vertices;
         bool usedInThisDFS;
+        bool stillExistsing;
  public:
-        explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {usedInThisDFS = false;}
+        explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {
+            usedInThisDFS = false; stillExistsing = true;}
 
         ~HyperEdge() {}
         inline std::vector<Vertex*> getVertices() const {return vertices;}
@@ -178,6 +180,8 @@ class HyperEdge {
                 }
                 std::cout << std::endl;
         }
+        inline bool isStillExistsing() const {return stillExistsing;}
+        inline void setStillExistsing(bool exists) {stillExistsing = exists;}
         inline bool isUsedInThisDFS() const {return usedInThisDFS;}
         inline void setUsedInThisDFS(bool used) {usedInThisDFS = used;}
 };

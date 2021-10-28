@@ -37,7 +37,9 @@ class M_compHyperGraph : public DirectedHyperGraph {
     ~M_compHyperGraph() {}
 
 
-    void addHyperEdge(const HyperEdge& edge, Vertex * head);
+    void addHyperEdge(const HyperEdge& edge, Vertex * head);  // never used
+    void addDirEdge(Vertex * head, Vertex * tail);
+
     void changeDirection(Node<DirectedHyperEdge*> edge, Vertex * to);
 
     std::vector<bool> getSameComponentVector(Vertex * v);

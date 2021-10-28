@@ -22,10 +22,11 @@ void DirectedHyperGraph::print() const {
 }
 
 void DirectedHyperEdge::changeUnderlyingEdge(HyperEdge* newHyperEdge) {
+    hyperEdge->setStillExistsing(false);
+    newHyperEdge->setStillExistsing(true);
     hyperEdge = newHyperEdge;
-
-    for (const auto& v : hyperEdge->getVertices()) {  // TODO: no change, just added. Is it O(|V|^2)?
-        v->inHyperEdge()->push_front(newHyperEdge);
+    for (const auto& v : hyperEdge->getVertices()) {  // It is still O(|V|^2), as at most double to amount of hyperedges can occur
+        v->inMcomp()->push_front(newHyperEdge);
     }
 }
 

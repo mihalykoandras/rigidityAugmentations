@@ -4,19 +4,31 @@
 #include "M-comp.h"
 
 void M_compHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
-    /* Ads undirected hyperedge every time if it encounters for every "inHypereedge"
-    Might be too much, as in hyperedge will be d(G) for every v.
+    /* 
+    Ads undirected hyperedge every time if it encounters for every "inMcomp"
     */
+
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
-    List<DirectedHyperEdge*> head_of_list = *head->isHeadOf();
     head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
 
     for (const auto& v : edge.getVertices()) {
-        v->inHyperEdge()->push_front(&undirectedHyperEdges.back());
+        v->inMcomp()->push_front(&undirectedHyperEdges.back());
     }
 }
+
+void M_compHyperGraph::addDirEdge(Vertex * head, Vertex * tail) {
+    /* 
+    Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
+    */
+    std::vector<Vertex *> vertices = {head, tail};
+    undirectedHyperEdges.emplace_back(vertices);
+    directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
+    head->isHeadOf()->push_front(&directedHyperEdges.back());
+    head->increaseInDegree();
+}
+
 
 void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge
 /*comes from the list head->isHeadOf*/, Vertex * to) {
@@ -28,17 +40,19 @@ void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge
     to->increaseInDegree();
 
     from->decreaseInDegree();
-    from->isHeadOf()->deleteNode(&edge);  //  Ha egy pont van, akkor hogyan törlünk?
+    from->isHeadOf()->deleteNode(&edge);
 }
 
 
 
 std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
     std::vector<bool> c_v(getNumberOfVertices(), 0);
-    Node<HyperEdge*>* hyperedge = v->inHyperEdge()->getFirst();
-    while (hyperedge != NULL) {  // TODO  Mivel az inHyperEdge többször is tartalmazhat u.a-t, ezért ez nem O(V^2)
-        for (const auto& vertex : hyperedge->getData()->getVertices()) {
-            c_v[vertex->getId()] = true;
+    Node<HyperEdge*>* hyperedge = v->inMcomp()->getFirst();
+    while (hyperedge != NULL) {
+        if (hyperedge->getData()->isStillExistsing()) {
+            for (const auto& vertex : hyperedge->getData()->getVertices()) {
+                c_v[vertex->getId()] = true;
+            }
         }
         hyperedge = hyperedge->getNext();
     }
@@ -146,9 +160,9 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
                     HyperEdge * newHyperEgde = new HyperEdge({v, neighbor});
                     SpanningGraph.addEdge(v->getId(), neighbor->getId());
                     if (v->getInDegree() < neighbor->getInDegree()) {
-                        addHyperEdge(*newHyperEgde, v);
+                        addDirEdge(v, neighbor);
                     } else {
-                        addHyperEdge(*newHyperEgde, neighbor);
+                        addDirEdge(neighbor, v);
                     }
                     continue;
                 } else {
@@ -168,7 +182,7 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
 int main() {
     SimpleGraph G;
     G.readFromInput();
-    M_compHyperGraph HG(G.getNumberOfNodes(), 1, 1);
+    M_compHyperGraph HG(G.getNumberOfNodes(), 2, 3);
     HG.MakeMCompHypergraph(G);
     HG.print();
 }
