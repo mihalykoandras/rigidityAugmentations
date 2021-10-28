@@ -76,6 +76,9 @@ struct Edge {
             std::vector<int> v = {epi, epj};
             return v;
         }
+        void print() const {
+            std::cout << epi << " " << epj <<std::endl;
+        }
 };
 
 class SimpleGraph {

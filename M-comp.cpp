@@ -249,7 +249,81 @@ std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L 
     }
     std::vector<Vertex *> P = StarSearch(ViL[0], L);
     P.push_back(ViL[0]);
+    if (P.size() < 2) {
+        std::cerr << "Too small transversal" << std::endl;
+    }
     return P;
+}
+
+bool M_compHyperGraph::threeInTwo(std::vector<Vertex* >& T1, std::vector<Vertex* >& T2, std::vector<Vertex* >& T3,
+    std::vector<Vertex* >& L1, std::vector<Vertex* >& L2) const {  // O(|V|)
+        std::vector<bool> isIn(getNumberOfVertices(), false);
+        for (Vertex * v : L1) {
+            isIn[v->getId()] = true;
+        }
+        for (Vertex * v : L2) {
+            isIn[v->getId()] = true;
+        }
+
+        for (Vertex * v : T1) {
+            if (!isIn[v->getId()])
+                return false;
+        }
+        for (Vertex * v : T2) {
+            if (!isIn[v->getId()])
+                return false;
+        }
+        for (Vertex * v : T3) {
+            if (!isIn[v->getId()])
+                return false;
+        }
+        return true;
+}
+
+std::vector<Edge> M_compHyperGraph::toRedund() {
+    if (getNumberOfVertices() < 4) {
+        std::cerr << "Too few vertices" << std::endl;
+        return std::vector<Edge>();
+    }
+    std::vector<Vertex *> P = findTransversal();
+    if (P.size() < 2) {
+        return std::vector<Edge>();
+    }
+    std::vector<Edge> F;
+    while (P.size() >= 4) {
+        Vertex * i_1 = P[0];
+        Vertex * i_h = P[P.size()-1];
+        Vertex * i_h1 = P[P.size()-2];
+        Vertex * i_h2 = P[P.size()-3];
+        std::vector<Vertex* > T_1_h2 = getT(i_1, i_h2);
+        std::vector<Vertex* > T_1_h1 = getT(i_1, i_h1);
+        std::vector<Vertex* > T_1_h = getT(i_1, i_h);
+        std::vector<Vertex* > T_h_h1 = getT(i_h, i_h1);
+        /* std::vector<Vertex* > T_h_h2 = getT(i_h, i_h2);
+        std::vector<Vertex* > T_h1_h2 = getT(i_h1, i_h2);
+
+
+        std::cout << "Melyik jo \n";
+        std::cout << "1_h, h1_h2: " << threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h, T_h1_h2)<< "\n";
+        std::cout << "1_h1, h_h2: " << threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h1, T_h_h2)<< "\n";
+        std::cout << "1_h2, h_h1: " << threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h2, T_h_h1)<< "\n"; */
+
+        if (threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h2, T_h_h1)) {
+            F.emplace_back(i_h1->getId(), i_h->getId());
+        } else {
+            F.emplace_back(i_h2->getId(), i_h->getId());
+            P[P.size()-3] = P[P.size()-2];
+        }
+        P.pop_back();
+        P.pop_back();
+    }
+    if (P.size() == 2) {
+        F.emplace_back(P[0]->getId(), P[1]->getId());
+    } else {  // == 3
+        F.emplace_back(P[0]->getId(), P[1]->getId());
+        F.emplace_back(P[0]->getId(), P[2]->getId());
+    }
+    return F;
 }
 
 
@@ -257,7 +331,7 @@ std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L 
 int main() {
     SimpleGraph G;
     G.readFromInput();
-    M_compHyperGraph HG(G.getNumberOfNodes(), 2, 3);
+    M_compHyperGraph HG(G.getNumberOfNodes(), 1, 1);
     HG.MakeMCompHypergraph(G);
     HG.print();
     std::vector<Vertex *> P = HG.findTransversal();
@@ -267,4 +341,8 @@ int main() {
          std::cout << " ";
     }
     std::cout << "\n";
+    std::vector<Edge> F = HG.toRedund();
+    for (Edge& f : F) {
+        f.print();
+    }
 }
