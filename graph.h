@@ -136,7 +136,6 @@ class Vertex {
         int inDegree;
         bool mark, usedForStar;
         Node<DirectedHyperEdge*> comeFrom;
-        List<HyperEdge*> undHyperEdges;
         List <DirectedHyperEdge*> headOfHyperEdge;
 
  public:
@@ -167,7 +166,6 @@ class Vertex {
         inline void setUsedForStar(bool flag) {usedForStar = flag;}
         inline Node<DirectedHyperEdge*> getFrom() {return comeFrom;}
         inline void setIncomingHyperedge(Node<DirectedHyperEdge*> from) {comeFrom = from;}
-        inline List<HyperEdge*>* inMcomp() {return &undHyperEdges;}
         inline List<DirectedHyperEdge*>* isHeadOf() {return &headOfHyperEdge;}
 
 
@@ -182,8 +180,11 @@ class HyperEdge {
         bool usedInThisDFS;
         bool stillExistsing;  // we don't delete the hyperedges that are now part of a bigger M-comp,
                               // just note that they are not useful any more
+        bool trivial;  // if it is underlying hyperedge for a non-trivial M-component or not
  public:
         explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {
+            usedInThisDFS = false; stillExistsing = true; trivial = true;}
+        HyperEdge(const std::vector<Vertex*>& v_, bool trivi) : vertices(v_), trivial(trivi) {
             usedInThisDFS = false; stillExistsing = true;}
 
         ~HyperEdge() {}
@@ -199,6 +200,8 @@ class HyperEdge {
         inline void setStillExistsing(bool exists) {stillExistsing = exists;}
         inline bool isUsedInThisDFS() const {return usedInThisDFS;}
         inline void setUsedInThisDFS(bool used) {usedInThisDFS = used;}
+        inline bool isTrivial() const {return trivial;}
+        inline void setTrivial(bool trivi) {trivial = trivi;}
 };
 
 class DirectedHyperEdge {
@@ -234,6 +237,7 @@ class DirectedHyperGraph {
         std::vector<Vertex> vertices;
         std::list<DirectedHyperEdge> directedHyperEdges;
         std::list<HyperEdge> undirectedHyperEdges;
+
         size_t size;
 
  public:

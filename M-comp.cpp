@@ -12,15 +12,10 @@ void M_compHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
     /* 
     Ads undirected hyperedge every time if it encounters for every "inMcomp"
     */
-
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
     head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
-
-    for (const auto& v : edge.getVertices()) {
-        v->inMcomp()->push_front(&undirectedHyperEdges.back());
-    }
 }
 
 void M_compHyperGraph::addDirEdge(Vertex * head, Vertex * tail) {
@@ -28,7 +23,7 @@ void M_compHyperGraph::addDirEdge(Vertex * head, Vertex * tail) {
     Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
     */
     std::vector<Vertex *> vertices = {head, tail};
-    undirectedHyperEdges.emplace_back(vertices);
+    undirectedHyperEdges.emplace_back(vertices, true);
     directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
     head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
@@ -51,15 +46,24 @@ void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge
 
 
 std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
+    /*
+        Running time is O(|V|) by Lemma 3.1
+    */
     std::vector<bool> c_v(getNumberOfVertices(), 0);
-    Node<HyperEdge*>* hyperedge = v->inMcomp()->getFirst();
-    while (hyperedge != NULL) {
-        if (hyperedge->getData()->isStillExistsing()) {
-            for (const auto& vertex : hyperedge->getData()->getVertices()) {
-                c_v[vertex->getId()] = true;
+    for (HyperEdge& undHyperEdge : undirectedHyperEdges) {
+        if (undHyperEdge.isStillExistsing() && !undHyperEdge.isTrivial()) { // no need for already deleted or trivial M-components
+            bool isVIn = false;
+            for (Vertex* vertex : undHyperEdge.getVertices()) {
+                if (*vertex == *v) {
+                    isVIn = true;
+                }
+            }
+            if (isVIn) {
+                for (Vertex* vertex : undHyperEdge.getVertices()) {
+                    c_v[vertex->getId()] = true;
+                }
             }
         }
-        hyperedge = hyperedge->getNext();
     }
     return c_v;
 }
@@ -168,7 +172,7 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
                     }
                     continue;
                 } else {
-                    undirectedHyperEdges.emplace_back(T);
+                    undirectedHyperEdges.emplace_back(T, false);
                     HyperEdge * newHyperEgde = &undirectedHyperEdges.back();
                     for (DirectedHyperEdge& hyperEdge : directedHyperEdges) {
                         if (hyperEdge.getHyperEdge()->isUsedInThisDFS()) {
@@ -337,8 +341,8 @@ std::vector<Edge> M_compHyperGraph::toRedund() {
 
 
 int main(int argc, char *argv[]) {
-    unsigned int k = 1;
-    int ell = 1;
+    unsigned int k = 2;
+    int ell = 3;
     if (argc == 3) {
         if (atoi(argv[1]) > 0) {
             k = atoi(argv[1]);
@@ -354,13 +358,13 @@ int main(int argc, char *argv[]) {
     HG.MakeMCompHypergraph(G);
     HG.print();
     std::vector<Vertex *> P = HG.findTransversal();
-    std::cout << "Vertices in P\n";
+    std::cout << "Transversal of the MCT sets of the M-comp hypergraph\n";
     for (Vertex * v : P) {
          v->print();
          std::cout << " ";
     }
     std::cout << "\n";
-    std::cout << "Optimal redund augmentation\n";
+    std::cout << "Optimal redund augmentation edges\n";
     std::vector<Edge> F = HG.toRedund();
     for (Edge& f : F) {
         f.print();
