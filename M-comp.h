@@ -19,6 +19,10 @@ class M_compHyperGraph : public DirectedHyperGraph {
  private:
     std::map<int, bool> vertexUsedInDFS;  // key is the id of the vertex
     std::map<int, Node<DirectedHyperEdge*> > comeFrom;  // contains the list of hyperedges needed to get to this node
+    std::map<HyperEdge*, bool> hyperedgeUsedInDFS;
+    std::map<HyperEdge*, bool> trivial;  // if it is underlying hyperedge for a non-trivial M-component or not
+
+
 
     inline bool isUsedInThisDFS(int id) {return vertexUsedInDFS[id];}
     inline bool isUsedInThisDFS(const Vertex& v) {return isUsedInThisDFS(v.getId());}
@@ -40,6 +44,12 @@ class M_compHyperGraph : public DirectedHyperGraph {
         setIncomingHyperedge(v->getId(), from);
     }
 
+    inline bool isUsedInThisDFS(HyperEdge* edge) {return hyperedgeUsedInDFS[edge];}
+    inline void setUsedInThisDFS(HyperEdge* edge, bool used) {hyperedgeUsedInDFS[edge] = used;}
+
+    inline bool isTrivial(HyperEdge* edge) {return trivial[edge];}
+    inline void setTrivial(HyperEdge* edge, bool used) {trivial[edge] = used;}
+
     std::map<int, bool> getSameComponentVector(Vertex * v);
     bool DFS(Vertex * v1, Vertex * v2);
 
@@ -60,6 +70,8 @@ class M_compHyperGraph : public DirectedHyperGraph {
         SpanningGraph = HG.SpanningGraph;
         vertexUsedInDFS = HG.vertexUsedInDFS;
         comeFrom = HG.comeFrom;
+        trivial = HG.trivial;
+        hyperedgeUsedInDFS = HG.hyperedgeUsedInDFS;
     }
 
     ~M_compHyperGraph() {}

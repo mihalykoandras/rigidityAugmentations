@@ -31,7 +31,7 @@ std::map<int, bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
     */
     std::map<int, bool> c_v;
     for (HyperEdge* undHyperEdge : undirectedHyperEdges) {
-        if (undHyperEdge->isStillExistsing() && !undHyperEdge->isTrivial()) {
+        if (undHyperEdge->isStillExistsing() && !isTrivial(undHyperEdge)) {
             // no need for already deleted or trivial M-components
             bool isVIn = false;
             for (Vertex* vertex : undHyperEdge->getVertices()) {
@@ -51,7 +51,7 @@ std::map<int, bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
 
 bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
     for (HyperEdge* h : undirectedHyperEdges) {  // O(n)
-        h->setUsedInThisDFS(false);
+        setUsedInThisDFS(h, false);
     }
     for (std::pair<const int, Vertex* > & v : vertices) {  // O(n)
         setUsedInThisDFS(v.second, false);
@@ -82,9 +82,9 @@ bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
             Node<DirectedHyperEdge*>* node = actualVertex->isHeadOf()->getFirst();
             while (node != NULL) {
                 DirectedHyperEdge* dirEdge = node->getData();
-                if (!dirEdge->getHyperEdge()->isUsedInThisDFS()) {
+                if (!isUsedInThisDFS(dirEdge->getHyperEdge())) {
                      // This can be used for transverse back
-                    dirEdge->getHyperEdge()->setUsedInThisDFS(true);
+                    setUsedInThisDFS(dirEdge->getHyperEdge(), true);
                     std::vector<Vertex *> edgeVertices = dirEdge->getHyperEdge()->getVertices();
                     for (Vertex* newVert : edgeVertices) {
                         if (!isUsedInThisDFS(newVert)) {
@@ -146,18 +146,20 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
 
                 if (T.empty()) {  // you can add one edge
                     HyperEdge * newHyperEgde = new HyperEdge({v, neighbor});
+                    setTrivial(newHyperEgde, true);  // this is a new edge, that is trivial
                     SpanningGraph.addEdge(v->getId(), neighbor->getId());
                     if (v->getInDegree() < neighbor->getInDegree()) {
-                        addDirEdge(v, neighbor);
+                        addHyperEdge(newHyperEgde, v);
                     } else {
-                        addDirEdge(neighbor, v);
+                        addHyperEdge(newHyperEgde, neighbor);
                     }
                     continue;
                 } else {
-                    undirectedHyperEdges.push_back(new HyperEdge(T, false));
+                    undirectedHyperEdges.push_back(new HyperEdge(T));
+                    setTrivial(undirectedHyperEdges.back(), false);  // this is not trivial hyperegde
                     HyperEdge * newHyperEgde = undirectedHyperEdges.back();
                     for (DirectedHyperEdge& hyperEdge : directedHyperEdges) {
-                        if (hyperEdge.getHyperEdge()->isUsedInThisDFS()) {
+                        if (isUsedInThisDFS(hyperEdge.getHyperEdge())) {
                             hyperEdge.changeUnderlyingEdge(newHyperEgde);
                         }
                     }

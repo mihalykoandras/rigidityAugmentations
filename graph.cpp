@@ -42,7 +42,7 @@ void DirectedHyperGraph::addDirEdge(Vertex * head, Vertex * tail) {
     Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
     */
     std::vector<Vertex *> vertices = {head, tail};
-    undirectedHyperEdges.push_back(new HyperEdge(vertices, true));
+    undirectedHyperEdges.push_back(new HyperEdge(vertices));
     directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
     head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
