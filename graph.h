@@ -31,6 +31,15 @@ template<typename T>class List{
 
  public:
     List() {first = NULL; numbOfData = 0;}
+    ~List() {
+        Node<T>* next;
+        while (first != NULL) {
+            next = first->getNext();
+            delete first;
+            first = next;
+        }
+    }
+
     void push_front(T new_data);
     void deleteNode(Node<T>* nodeToDelete);
     bool isEmpty() const {return numbOfData == 0;}
