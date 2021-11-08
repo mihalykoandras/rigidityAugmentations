@@ -3,25 +3,45 @@
 
 #include <vector>
 #include <list>
+#include <map>
 
 #include "graph.h"
 
 
-
 class M_compHyperGraph : public DirectedHyperGraph {
- private:
+ protected:
     unsigned int k;
     int ell;
+
     SimpleGraph SpanningGraph;
+
+
+ private:
+    std::map<int, bool> vertexUsedInDFS;  // key is the id of the vertex
+    std::map<int, Node<DirectedHyperEdge*> > comeFrom;  // contains the list of hyperedges needed to get to this node
+
+    inline bool isUsedInThisDFS(int id) {return vertexUsedInDFS[id];}
+    inline bool isUsedInThisDFS(const Vertex& v) {return isUsedInThisDFS(v.getId());}
+    inline bool isUsedInThisDFS(const Vertex* v) {return isUsedInThisDFS(v->getId());}
+
+    inline void setUsedInThisDFS(int id, bool used) {vertexUsedInDFS[id] = used;}
+    inline void setUsedInThisDFS(const Vertex * v, bool used) {setUsedInThisDFS(v->getId(), used);}
+    inline void setUsedInThisDFS(const Vertex& v, bool used) {setUsedInThisDFS(v.getId(), used);}
+
+    inline Node<DirectedHyperEdge*> getIncomingHyperedge(int id) {return comeFrom[id];}
+    inline Node<DirectedHyperEdge*> getIncomingHyperedge(const Vertex& v) {return getIncomingHyperedge(v.getId());}
+    inline Node<DirectedHyperEdge*> getIncomingHyperedge(const Vertex* v) {return getIncomingHyperedge(v->getId());}
+
+    inline void setIncomingHyperedge(int id, Node<DirectedHyperEdge*> from) {comeFrom[id] = from;}
+    inline void setIncomingHyperedge(const Vertex& v, Node<DirectedHyperEdge*> from) {
+        setIncomingHyperedge(v.getId(), from);
+    }
+    inline void setIncomingHyperedge(const Vertex * v, Node<DirectedHyperEdge*> from) {
+        setIncomingHyperedge(v->getId(), from);
+    }
 
     std::vector<bool> getSameComponentVector(Vertex * v);
     bool DFS(Vertex * v1, Vertex * v2);
-    Vertex * findLowDegreeVertex();
-    void markOneTight(Vertex * head, Vertex * j);
-    bool isWholeSized(const std::vector<Vertex* >& V) const {return V.size() == size;}
-    std::vector<Vertex*> StarSearch(Vertex * i, std::vector<Vertex*> L);
-    bool threeInTwo(const std::vector<Vertex* >& T1, const std::vector<Vertex* >& T2, const std::vector<Vertex* >& T3,
-    const std::vector<Vertex* >& L1, const std::vector<Vertex* >& L2) const;
 
  public:
     M_compHyperGraph(size_t n, unsigned int k_, int ell_) {
@@ -30,32 +50,30 @@ class M_compHyperGraph : public DirectedHyperGraph {
         size = n;
         SpanningGraph = SimpleGraph(size);
         for (size_t i = 0; i < size; i++) {
-            vertices.emplace_back(i);
+            insertNewVertex(i);
         }
     }
 
-    M_compHyperGraph(const M_compHyperGraph& HG) {
+    M_compHyperGraph(const M_compHyperGraph& HG) : DirectedHyperGraph(HG) {
         k = HG.k;
         ell = HG.ell;
-        vertices = HG.vertices;
-        directedHyperEdges = HG.directedHyperEdges;
-        undirectedHyperEdges = HG. undirectedHyperEdges;
-        size = HG.size;
+        SpanningGraph = HG.SpanningGraph;
+        vertexUsedInDFS = HG.vertexUsedInDFS;
+        comeFrom = HG.comeFrom;
     }
 
     ~M_compHyperGraph() {}
 
-
-    void addHyperEdge(const HyperEdge& edge, Vertex * head);  // never used
+    void addHyperEdge(HyperEdge* edge, Vertex * head);  // never used
     void addDirEdge(Vertex * head, Vertex * tail);
     void changeDirection(Node<DirectedHyperEdge*> edge, Vertex * to);
 
     bool isRigid() const {return SpanningGraph.getEdges().size() == k* getNumberOfVertices() - ell;}
-    
+
     std::vector<Vertex*> getT(Vertex * v1, Vertex * v2);
+    std::vector<Vertex*> getT(int i, int j) {return getT(vertices[i], vertices[j]);}
+
     void MakeMCompHypergraph(const SimpleGraph& G);
-    std::vector<Vertex *> findTransversal(std::vector<Vertex *> L);
-    std::vector<Edge> toRedund();
 
     void print() const;
 };

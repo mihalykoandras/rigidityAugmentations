@@ -28,9 +28,9 @@ void DirectedHyperEdge::changeUnderlyingEdge(HyperEdge* newHyperEdge) {
 }
 
 
-void DirectedHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
+void DirectedHyperGraph::addHyperEdge(HyperEdge* edge,  Vertex * head) {
     undirectedHyperEdges.push_back(edge);
-    directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
+    directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
     head->increaseInDegree();
 }
 
@@ -52,13 +52,13 @@ void DirectedHyperGraph::readFromInput() {
         std::cin >> v;
 
         while (v >= 0 && v < getNumberOfVertices()) {
-            edgeVertices.push_back(&vertices[v]);
+            edgeVertices.push_back(vertices[v]);
             if (h == -1)  // Hack to store head
                 h = v;
             std::cin >> v;
         }
-        HyperEdge newHyperEgde(edgeVertices);
-        addHyperEdge(newHyperEgde, &vertices[h]);
+        HyperEdge* newHyperEgde= new HyperEdge(edgeVertices);
+        addHyperEdge(newHyperEgde, vertices[h]);
     }
 }
 

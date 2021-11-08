@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <map>
 
 template<typename T>class Node{
  private:
@@ -127,24 +128,18 @@ class DirectedHyperEdge;
 
 
 class Vertex {
-    /* Highly speciliazed Vertex class. Contains the edges that it is a head of, 
-    undirected hyperedges that contains it, and also the data for the DFS. 
+    /* 
+    Directed hypergraph vertex. Keeps the list of hyperedges it is head of.
      */
  private:
         int id;
-        bool usedInDFS;
         int inDegree;
-        bool mark, usedForStar;
-        Node<DirectedHyperEdge*> comeFrom;
         List <DirectedHyperEdge*> headOfHyperEdge;
 
  public:
         Vertex() {}
         explicit Vertex(int id_):id(id_) {
             inDegree = 0;
-            usedInDFS = false;
-            mark = false;
-            usedForStar = false;
         }
 
         ~Vertex() {}
@@ -156,17 +151,21 @@ class Vertex {
         inline bool operator>(const Vertex &v) const {return id > v.getId();}
 
         inline int getInDegree() const {return inDegree;}
-        inline void decreaseInDegree() {inDegree--;}  // TODO check if in-degree is >0
+        inline void decreaseInDegree() {
+            if (inDegree > 0)
+                inDegree--;  // TODO else exception
+            }
         inline void increaseInDegree() {inDegree++;}
-        inline bool isUsedInThisDFS() const {return usedInDFS;}
-        inline void setUsedInThisDFS(bool used) {usedInDFS = used;}
+        inline List<DirectedHyperEdge*>* isHeadOf() {return &headOfHyperEdge;}
+
+        /* 
         inline bool isMarked() const {return mark;}
         inline void setMark(bool flag) {mark = flag;}
         inline bool isUsedForStar() const {return usedForStar;}
         inline void setUsedForStar(bool flag) {usedForStar = flag;}
         inline Node<DirectedHyperEdge*> getFrom() {return comeFrom;}
         inline void setIncomingHyperedge(Node<DirectedHyperEdge*> from) {comeFrom = from;}
-        inline List<DirectedHyperEdge*>* isHeadOf() {return &headOfHyperEdge;}
+        */
 
 
         inline void print() const {
@@ -181,6 +180,7 @@ class HyperEdge {
         bool stillExistsing;  // we don't delete the hyperedges that are now part of a bigger M-comp,
                               // just note that they are not useful any more
         bool trivial;  // if it is underlying hyperedge for a non-trivial M-component or not
+
  public:
         explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) {
             usedInThisDFS = false; stillExistsing = true; trivial = true;}
@@ -234,9 +234,9 @@ class DirectedHyperGraph {
         It does not implement any funcionality over the basics, that is for the M_comp_Hyper_Graph class
     */
  protected:
-        std::vector<Vertex> vertices;
+        std::map<int, Vertex*> vertices;  // key is the ID of the vertex
         std::list<DirectedHyperEdge> directedHyperEdges;
-        std::list<HyperEdge> undirectedHyperEdges;
+        std::list<HyperEdge*> undirectedHyperEdges;
 
         size_t size;
 
@@ -245,44 +245,53 @@ class DirectedHyperGraph {
         explicit DirectedHyperGraph(size_t n) {
             size = n;
             for (size_t i = 0; i < size; i++) {
-                vertices.emplace_back(i);
+                insertNewVertex(i);
             }
         }
 
         explicit DirectedHyperGraph(const SimpleGraph& G) {
             size = G.getNumberOfNodes();
-            for (size_t i = 0; i < size; i++) {
-                vertices.emplace_back(i);
-            }
 
             std::vector<Edge> graphEdges = G.getEdges();
 
             for (const auto& e : graphEdges) {
                 std::vector<int> edge = e.getEdge();
+                insertNewVertex(edge[0]);
+                insertNewVertex(edge[1]);
                 std::vector<Vertex*> edgeVertices = {&vertices[edge[0]], &vertices[edge[1]]};
 
-                HyperEdge newHyperEgde(edgeVertices);
+                HyperEdge* newHyperEgde = new HyperEdge(edgeVertices);
 
-                addHyperEdge(newHyperEgde, &vertices[edge[0]]);
+                addHyperEdge(newHyperEgde, vertices[edge[0]]);
             }
         }
 
         DirectedHyperGraph(const DirectedHyperGraph& HG) {
             vertices = HG.vertices;
             directedHyperEdges = HG.directedHyperEdges;
-            undirectedHyperEdges = HG. undirectedHyperEdges;
+            undirectedHyperEdges = HG.undirectedHyperEdges;
             size = HG.size;
         }
 
-        ~DirectedHyperGraph() {}
+        ~DirectedHyperGraph() {
+            vertices.clear();
+            undirectedHyperEdges.clear();
+        }
+
+        void inline insertNewVertex(int id) {  // insert new vertex only if id is not contained
+            if (vertices.find(id) == vertices.end()) {
+                    vertices[id] = new Vertex(id);
+                }
+        }
+
         inline size_t getNumberOfVertices() const {return size;}
         inline size_t getNumberOfEdges() const {return directedHyperEdges.size();}
 
 
-        inline Vertex * getVertex(int i) {return &vertices[i];}
-        inline std::list<HyperEdge> * getUndirectedHyperEdges() {return &undirectedHyperEdges;}
+        inline Vertex * getVertex(int i) {return vertices[i];}
+        inline std::list<HyperEdge*>* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
 
-        void addHyperEdge(const HyperEdge& edge, Vertex * head);
+        void addHyperEdge(HyperEdge* edge, Vertex * head);
         void changeDirection(DirectedHyperEdge& edge, Vertex * to);
 
 

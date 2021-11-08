@@ -1,4 +1,6 @@
 #include <queue>
+#include <utility>
+
 
 #include "graph.h"
 #include "M-comp.h"
@@ -8,12 +10,12 @@ void M_compHyperGraph::print() const {
     DirectedHyperGraph::print();
 }
 
-void M_compHyperGraph::addHyperEdge(const HyperEdge& edge,  Vertex * head) {
+void M_compHyperGraph::addHyperEdge(HyperEdge* edge,  Vertex * head) {
     /* 
     Ads undirected hyperedge every time if it encounters for every "inMcomp"
     */
     undirectedHyperEdges.push_back(edge);
-    directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
+    directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
     head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
 }
@@ -23,8 +25,8 @@ void M_compHyperGraph::addDirEdge(Vertex * head, Vertex * tail) {
     Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
     */
     std::vector<Vertex *> vertices = {head, tail};
-    undirectedHyperEdges.emplace_back(vertices, true);
-    directedHyperEdges.emplace_back(head, &undirectedHyperEdges.back());
+    undirectedHyperEdges.push_back(new HyperEdge(vertices, true));
+    directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
     head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
 }
@@ -50,16 +52,17 @@ std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
         Running time is O(|V|) by Lemma 3.1
     */
     std::vector<bool> c_v(getNumberOfVertices(), 0);
-    for (HyperEdge& undHyperEdge : undirectedHyperEdges) {
-        if (undHyperEdge.isStillExistsing() && !undHyperEdge.isTrivial()) { // no need for already deleted or trivial M-components
+    for (HyperEdge* undHyperEdge : undirectedHyperEdges) {
+        if (undHyperEdge->isStillExistsing() && !undHyperEdge->isTrivial()) {
+            // no need for already deleted or trivial M-components
             bool isVIn = false;
-            for (Vertex* vertex : undHyperEdge.getVertices()) {
+            for (Vertex* vertex : undHyperEdge->getVertices()) {
                 if (*vertex == *v) {
                     isVIn = true;
                 }
             }
             if (isVIn) {
-                for (Vertex* vertex : undHyperEdge.getVertices()) {
+                for (Vertex* vertex : undHyperEdge->getVertices()) {
                     c_v[vertex->getId()] = true;
                 }
             }
@@ -69,19 +72,19 @@ std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
 }
 
 bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
-    for (HyperEdge& h : undirectedHyperEdges) {  // O(n)
-        h.setUsedInThisDFS(false);
+    for (HyperEdge* h : undirectedHyperEdges) {  // O(n)
+        h->setUsedInThisDFS(false);
     }
-    for (Vertex& v : vertices) {  // O(n)
-        v.setUsedInThisDFS(false);
+    for (std::pair<const int, Vertex* > & v : vertices) {  // O(n)
+        setUsedInThisDFS(v.second, false);
     }
     std::queue<Vertex *> Q;
 
     Q.push(v1);
-    v1->setUsedInThisDFS(true);
+    setUsedInThisDFS(v1, true);
 
     Q.push(v2);
-    v2->setUsedInThisDFS(true);
+    setUsedInThisDFS(v2, true);
 
     while (!Q.empty()) {
         Vertex * actualVertex = Q.front();
@@ -91,7 +94,7 @@ bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
             // turn around and return
             Vertex * v = actualVertex;
             do {
-                Node<DirectedHyperEdge*> comeFrom = actualVertex->getFrom();
+                Node<DirectedHyperEdge*> comeFrom = getIncomingHyperedge(actualVertex);
                 v = comeFrom.getData()->getHead();
                 changeDirection(comeFrom, actualVertex);
                 actualVertex = v;
@@ -106,9 +109,9 @@ bool M_compHyperGraph::DFS(Vertex * v1, Vertex * v2) {
                     dirEdge->getHyperEdge()->setUsedInThisDFS(true);
                     std::vector<Vertex *> edgeVertices = dirEdge->getHyperEdge()->getVertices();
                     for (Vertex* newVert : edgeVertices) {
-                        if (!newVert->isUsedInThisDFS()) {
-                            newVert->setUsedInThisDFS(true);
-                            newVert->setIncomingHyperedge(*node);
+                        if (!isUsedInThisDFS(newVert)) {
+                            setUsedInThisDFS(newVert, true);
+                            setIncomingHyperedge(newVert, *node);
                             Q.push(newVert);
                         }
                     }
@@ -132,9 +135,9 @@ std::vector<Vertex *> M_compHyperGraph::getT(Vertex * v1, Vertex * v2) {
     if (v1->getInDegree() + v2-> getInDegree() <= maxSumDegree) {
         return T;
     } else {
-        for (Vertex& v : vertices) {
-            if (v.isUsedInThisDFS()) {
-                T.push_back(&v);
+        for (std::pair<const int, Vertex* > & v : vertices) {
+            if (isUsedInThisDFS(v.second)) {
+                T.push_back(v.second);
             }
         }
     }
@@ -172,8 +175,8 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
                     }
                     continue;
                 } else {
-                    undirectedHyperEdges.emplace_back(T, false);
-                    HyperEdge * newHyperEgde = &undirectedHyperEdges.back();
+                    undirectedHyperEdges.push_back(new HyperEdge(T, false));
+                    HyperEdge * newHyperEgde = undirectedHyperEdges.back();
                     for (DirectedHyperEdge& hyperEdge : directedHyperEdges) {
                         if (hyperEdge.getHyperEdge()->isUsedInThisDFS()) {
                             hyperEdge.changeUnderlyingEdge(newHyperEgde);
@@ -185,188 +188,3 @@ void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
     }
 }
 
-void M_compHyperGraph::markOneTight(Vertex * head, Vertex * j) {
-    std::vector<Vertex *> Tij = getT(head, j);
-    for (Vertex* v : Tij) {
-        v->setMark(true);
-        v->setUsedForStar(false);
-    }
-    j->setUsedForStar(true);
-}
-
-
-std::vector<Vertex *> M_compHyperGraph::StarSearch(Vertex * i, std::vector<Vertex *> L = std::vector<Vertex *>()) {
-    /*
-        Algorithm 4.4 in the paper
-        O(|V|^2)
-    */
-    for (Vertex& v : vertices) {
-        v.setMark(false);
-        v.setUsedForStar(false);
-    }
-
-    i->setMark(true);
-    for (Vertex* j : L) {
-        if (!j->isMarked()) {
-            markOneTight(i, j);
-        }
-    }
-
-    for (Vertex& v : vertices) {
-        if (!v.isMarked()) {
-            markOneTight(i, &v);
-        }
-    }
-    std::vector<Vertex *> P(0);
-     for (Vertex& v : vertices) {
-        if (v.isUsedForStar()) {
-            P.push_back(&v);
-        }
-    }
-    return P;
-}
-
-Vertex * M_compHyperGraph::findLowDegreeVertex() {
-    std::vector<int> degree(getNumberOfVertices(), 0);
-    for (auto& edge : SpanningGraph.getEdges()) {
-        degree[edge.getEdge()[0]]++;
-        degree[edge.getEdge()[1]]++;
-    }
-
-    int i = 0;
-    while (degree[i] >= 2 * k) {i++;}
-    return getVertex(i);
-}
-
-
-std::vector<Vertex *> M_compHyperGraph::findTransversal(std::vector<Vertex *> L = std::vector<Vertex *>()) {
-    if (isRigid()) {
-    Vertex * i = findLowDegreeVertex();
-    std::vector<Vertex *> ViL = StarSearch(i, L);
-    if (ViL.size() == 1) {
-        ViL.push_back(i);
-        return ViL;
-    }
-    if (ViL.size() == 2) {
-        for (Vertex& v : vertices) {
-            if (isWholeSized(getT(ViL[0], &v))) {
-                return std::vector<Vertex *>{ViL[0], &v};
-            }
-            if (isWholeSized(getT(ViL[1], &v))) {
-                return std::vector<Vertex *>{ViL[1], &v};
-            }
-        }
-    }
-    std::vector<Vertex *> P = StarSearch(ViL[0], L);
-    P.push_back(ViL[0]);
-    if (P.size() < 2) {
-        std::cerr << "Too small transversal" << std::endl;
-    }
-    return P;
-    } else {
-        std::cerr << "G is not rigid" <<std::endl;
-        return  std::vector<Vertex *>();
-    }
-}
-
-bool M_compHyperGraph::threeInTwo(
-    const std::vector<Vertex* >& T1, const std::vector<Vertex* >& T2, const std::vector<Vertex* >& T3,
-    const std::vector<Vertex* >& L1, const std::vector<Vertex* >& L2) const {  // O(|V|)
-        std::vector<bool> isIn(getNumberOfVertices(), false);
-        for (Vertex * v : L1) {
-            isIn[v->getId()] = true;
-        }
-        for (Vertex * v : L2) {
-            isIn[v->getId()] = true;
-        }
-
-        for (Vertex * v : T1) {
-            if (!isIn[v->getId()])
-                return false;
-        }
-        for (Vertex * v : T2) {
-            if (!isIn[v->getId()])
-                return false;
-        }
-        for (Vertex * v : T3) {
-            if (!isIn[v->getId()])
-                return false;
-        }
-        return true;
-}
-
-std::vector<Edge> M_compHyperGraph::toRedund() {
-    if (getNumberOfVertices() < 4) {
-        std::cerr << "Too few vertices" << std::endl;
-        return std::vector<Edge>();
-    }
-    if (isRigid()) {
-    std::vector<Vertex *> P = findTransversal();
-    if (P.size() < 2) {
-        return std::vector<Edge>();
-    }
-    std::vector<Edge> F;
-    while (P.size() >= 4) {
-        Vertex * i_1 = P[0];
-        Vertex * i_h = P[P.size()-1];
-        Vertex * i_h1 = P[P.size()-2];
-        Vertex * i_h2 = P[P.size()-3];
-        std::vector<Vertex* > T_1_h2 = getT(i_1, i_h2);
-        std::vector<Vertex* > T_1_h1 = getT(i_1, i_h1);
-        std::vector<Vertex* > T_1_h = getT(i_1, i_h);
-        std::vector<Vertex* > T_h_h1 = getT(i_h, i_h1);
-
-        if (threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h2, T_h_h1)) {
-            F.emplace_back(i_h1->getId(), i_h->getId());
-        } else {
-            F.emplace_back(i_h2->getId(), i_h->getId());
-            P[P.size()-3] = P[P.size()-2];
-        }
-        P.pop_back();
-        P.pop_back();
-    }
-    if (P.size() == 2) {
-        F.emplace_back(P[0]->getId(), P[1]->getId());
-    } else {  // == 3
-        F.emplace_back(P[0]->getId(), P[1]->getId());
-        F.emplace_back(P[0]->getId(), P[2]->getId());
-    }
-    return F;
-    } else {
-        std::cerr << "G is not rigid" <<std::endl;
-        return std::vector<Edge>();
-    }
-}
-
-
-
-int main(int argc, char *argv[]) {
-    unsigned int k = 2;
-    int ell = 3;
-    if (argc == 3) {
-        if (atoi(argv[1]) > 0) {
-            k = atoi(argv[1]);
-            ell = atoi(argv[2]);
-        } else {
-            std::cerr << "k is not correct" << std::endl;
-        }
-    }
-
-    SimpleGraph G;
-    G.readFromInput();
-    M_compHyperGraph HG(G.getNumberOfNodes(), k, ell);
-    HG.MakeMCompHypergraph(G);
-    HG.print();
-    std::vector<Vertex *> P = HG.findTransversal();
-    std::cout << "Transversal of the MCT sets of the M-comp hypergraph\n";
-    for (Vertex * v : P) {
-         v->print();
-         std::cout << " ";
-    }
-    std::cout << "\n";
-    std::cout << "Optimal redund augmentation edges\n";
-    std::vector<Edge> F = HG.toRedund();
-    for (Edge& f : F) {
-        f.print();
-    }
-}
