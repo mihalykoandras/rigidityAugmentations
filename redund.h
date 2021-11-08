@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <map>
+#include <memory>
+
 
 #include "graph.h"
 #include "M-comp.h"

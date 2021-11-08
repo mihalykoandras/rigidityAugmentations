@@ -11,9 +11,9 @@ void M_compHyperGraph::print() const {
 }
 
 
-void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge* > edge
+void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> > edge
 /*comes from the list head->isHeadOf*/, std::shared_ptr<Vertex> to) {
-    DirectedHyperEdge* newEdge = edge.getData();
+    std::shared_ptr<DirectedHyperEdge> newEdge = edge.getData();
     std::shared_ptr<Vertex> from = newEdge->getHead();
     newEdge->setHead(to);
 
@@ -72,16 +72,16 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
             // turn around and return
             std::shared_ptr<Vertex> v = actualVertex;
             do {
-                Node<DirectedHyperEdge* > comeFrom = getIncomingHyperedge(actualVertex);
+                Node<std::shared_ptr<DirectedHyperEdge> > comeFrom = getIncomingHyperedge(actualVertex);
                 v = comeFrom.getData()->getHead();
                 changeDirection(comeFrom, actualVertex);
                 actualVertex = v;
             } while ( !((*actualVertex == *v1) || (*actualVertex == *v2)) );
             return true;
         } else {
-            Node<DirectedHyperEdge* >* node = actualVertex->isHeadOf()->getFirst();
+            Node<std::shared_ptr<DirectedHyperEdge> >* node = actualVertex->isHeadOf()->getFirst();
             while (node != NULL) {
-                DirectedHyperEdge* dirEdge = node->getData();
+                std::shared_ptr<DirectedHyperEdge> dirEdge = node->getData();
                 if (!isUsedInThisDFS(dirEdge->getHyperEdge())) {
                      // This can be used for transverse back
                     setUsedInThisDFS(dirEdge->getHyperEdge(), true);
@@ -159,9 +159,9 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                     undirectedHyperEdges.push_back(std::make_shared<HyperEdge>(T));
                     setTrivial(undirectedHyperEdges.back(), false);  // this is not trivial hyperegde
                     std::shared_ptr<HyperEdge> newHyperEgde = undirectedHyperEdges.back();
-                    for (DirectedHyperEdge& hyperEdge : directedHyperEdges) {
-                        if (isUsedInThisDFS(hyperEdge.getHyperEdge())) {
-                            hyperEdge.changeUnderlyingEdge(newHyperEgde);
+                    for (auto& hyperEdge : directedHyperEdges) {
+                        if (isUsedInThisDFS(hyperEdge->getHyperEdge())) {
+                            hyperEdge->changeUnderlyingEdge(newHyperEgde);
                         }
                     }
                 }

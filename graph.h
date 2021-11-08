@@ -135,7 +135,7 @@ class Vertex {
  private:
         int id;
         int inDegree;
-        List <DirectedHyperEdge* > headOfHyperEdge;
+        List <std::shared_ptr<DirectedHyperEdge> > headOfHyperEdge;
 
  public:
         Vertex() {}
@@ -157,7 +157,7 @@ class Vertex {
                 inDegree--;  // TODO else exception
             }
         inline void increaseInDegree() {inDegree++;}
-        inline List<DirectedHyperEdge* >* isHeadOf() {return &headOfHyperEdge;}
+        inline List<std::shared_ptr<DirectedHyperEdge> >* isHeadOf() {return &headOfHyperEdge;}
         inline void print() const {
                 std::cout << id;
         }
@@ -218,8 +218,7 @@ class DirectedHyperGraph {
     */
  protected:
         std::map<int, std::shared_ptr<Vertex> > vertices;  // key is the ID of the vertex
-        std::list<DirectedHyperEdge> directedHyperEdges;
-        // this does not need to be pointer, as it contains just two pointers itself
+        std::list<std::shared_ptr<DirectedHyperEdge> > directedHyperEdges;
         std::list<std::shared_ptr<HyperEdge> > undirectedHyperEdges;
         size_t size;
 
