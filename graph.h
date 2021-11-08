@@ -135,7 +135,7 @@ class Vertex {
  private:
         int id;
         int inDegree;
-        List <DirectedHyperEdge*> headOfHyperEdge;
+        List <DirectedHyperEdge* > headOfHyperEdge;
 
  public:
         Vertex() {}
@@ -157,7 +157,7 @@ class Vertex {
                 inDegree--;  // TODO else exception
             }
         inline void increaseInDegree() {inDegree++;}
-        inline List<DirectedHyperEdge*>* isHeadOf() {return &headOfHyperEdge;}
+        inline List<DirectedHyperEdge* >* isHeadOf() {return &headOfHyperEdge;}
         inline void print() const {
                 std::cout << id;
         }
@@ -188,18 +188,18 @@ class HyperEdge {
 
 class DirectedHyperEdge {
  private:
-        HyperEdge *hyperEdge;
+        std::shared_ptr<HyperEdge>hyperEdge;
         std::shared_ptr<Vertex> head;
 
  public:
         DirectedHyperEdge() {}
-        DirectedHyperEdge(std::shared_ptr<Vertex> head_, HyperEdge* hyperedge_)
+        DirectedHyperEdge(std::shared_ptr<Vertex> head_, std::shared_ptr<HyperEdge> hyperedge_)
          : head(head_), hyperEdge(hyperedge_) {}
         ~DirectedHyperEdge() {}
         inline std::shared_ptr<Vertex> getHead() const {return head;}
         inline void setHead(std::shared_ptr<Vertex> v) {head = v;}
-        inline HyperEdge * getHyperEdge() {return hyperEdge;}
-        void changeUnderlyingEdge(HyperEdge* hyperEdge_);
+        inline std::shared_ptr<HyperEdge> getHyperEdge() {return hyperEdge;}
+        void changeUnderlyingEdge(std::shared_ptr<HyperEdge> hyperEdge_);
 
         inline void print() const {
             std::cout << "Head: ";
@@ -220,7 +220,7 @@ class DirectedHyperGraph {
         std::map<int, std::shared_ptr<Vertex> > vertices;  // key is the ID of the vertex
         std::list<DirectedHyperEdge> directedHyperEdges;
         // this does not need to be pointer, as it contains just two pointers itself
-        std::list<HyperEdge*> undirectedHyperEdges;
+        std::list<std::shared_ptr<HyperEdge> > undirectedHyperEdges;
         size_t size;
 
  public:
@@ -268,9 +268,9 @@ class DirectedHyperGraph {
 
 
         inline std::shared_ptr<Vertex> getVertex(int i) {return vertices[i];}
-        inline std::list<HyperEdge*>* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
+        inline std::list<std::shared_ptr<HyperEdge> >* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
 
-        void addHyperEdge(HyperEdge* edge, std::shared_ptr<Vertex> head);
+        void addHyperEdge(std::shared_ptr<HyperEdge> edge, std::shared_ptr<Vertex> head);
         void addDirEdge(std::shared_ptr<Vertex> head, std::shared_ptr<Vertex> tail);
         void changeDirection(DirectedHyperEdge& edge, std::shared_ptr<Vertex> to);
 

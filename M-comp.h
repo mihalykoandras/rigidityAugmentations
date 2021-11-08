@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <memory>
 
 #include "graph.h"
 
@@ -18,9 +19,9 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
  private:
     std::map<int, bool> vertexUsedInDFS;  // key is the id of the vertex
-    std::map<int, Node<DirectedHyperEdge*> > comeFrom;  // contains the list of hyperedges needed to get to this node
-    std::map<HyperEdge*, bool> hyperedgeUsedInDFS;
-    std::map<HyperEdge*, bool> trivial;  // if it is underlying hyperedge for a non-trivial M-component or not
+    std::map<int, Node<DirectedHyperEdge* > > comeFrom;  // contains the list of hyperedges needed to get to this node
+    std::map<std::shared_ptr<HyperEdge>, bool> hyperedgeUsedInDFS;
+    std::map<std::shared_ptr<HyperEdge>, bool> trivial;  // if it is underlying hyperedge for a non-trivial M-component or not
 
 
 
@@ -32,23 +33,23 @@ class M_compHyperGraph : public DirectedHyperGraph {
     inline void setUsedInThisDFS(const std::shared_ptr<Vertex>  v, bool used) {setUsedInThisDFS(v->getId(), used);}
     inline void setUsedInThisDFS(const Vertex& v, bool used) {setUsedInThisDFS(v.getId(), used);}
 
-    inline Node<DirectedHyperEdge*> getIncomingHyperedge(int id) {return comeFrom[id];}
-    inline Node<DirectedHyperEdge*> getIncomingHyperedge(const Vertex& v) {return getIncomingHyperedge(v.getId());}
-    inline Node<DirectedHyperEdge*> getIncomingHyperedge(const std::shared_ptr<Vertex> v) {return getIncomingHyperedge(v->getId());}
+    inline Node<DirectedHyperEdge* > getIncomingHyperedge(int id) {return comeFrom[id];}
+    inline Node<DirectedHyperEdge* > getIncomingHyperedge(const Vertex& v) {return getIncomingHyperedge(v.getId());}
+    inline Node<DirectedHyperEdge* > getIncomingHyperedge(const std::shared_ptr<Vertex> v) {return getIncomingHyperedge(v->getId());}
 
-    inline void setIncomingHyperedge(int id, Node<DirectedHyperEdge*> from) {comeFrom[id] = from;}
-    inline void setIncomingHyperedge(const Vertex& v, Node<DirectedHyperEdge*> from) {
+    inline void setIncomingHyperedge(int id, Node<DirectedHyperEdge* > from) {comeFrom[id] = from;}
+    inline void setIncomingHyperedge(const Vertex& v, Node<DirectedHyperEdge* > from) {
         setIncomingHyperedge(v.getId(), from);
     }
-    inline void setIncomingHyperedge(const std::shared_ptr<Vertex>  v, Node<DirectedHyperEdge*> from) {
+    inline void setIncomingHyperedge(const std::shared_ptr<Vertex>  v, Node<DirectedHyperEdge* > from) {
         setIncomingHyperedge(v->getId(), from);
     }
 
-    inline bool isUsedInThisDFS(HyperEdge* edge) {return hyperedgeUsedInDFS[edge];}
-    inline void setUsedInThisDFS(HyperEdge* edge, bool used) {hyperedgeUsedInDFS[edge] = used;}
+    inline bool isUsedInThisDFS(std::shared_ptr<HyperEdge> edge) {return hyperedgeUsedInDFS[edge];}
+    inline void setUsedInThisDFS(std::shared_ptr<HyperEdge> edge, bool used) {hyperedgeUsedInDFS[edge] = used;}
 
-    inline bool isTrivial(HyperEdge* edge) {return trivial[edge];}
-    inline void setTrivial(HyperEdge* edge, bool used) {trivial[edge] = used;}
+    inline bool isTrivial(std::shared_ptr<HyperEdge> edge) {return trivial[edge];}
+    inline void setTrivial(std::shared_ptr<HyperEdge> edge, bool used) {trivial[edge] = used;}
 
     std::map<int, bool> getSameComponentVector(std::shared_ptr<Vertex>  v);
     bool DFS(std::shared_ptr<Vertex>  v1, std::shared_ptr<Vertex>  v2);
@@ -76,7 +77,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
     ~M_compHyperGraph() {}
 
-    void changeDirection(Node<DirectedHyperEdge*> edge, std::shared_ptr<Vertex>  to);
+    void changeDirection(Node<DirectedHyperEdge* > edge, std::shared_ptr<Vertex>  to);
 
     bool isRigid() const {return SpanningGraph.getEdges().size() == k* getNumberOfVertices() - ell;}
 

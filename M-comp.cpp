@@ -11,7 +11,7 @@ void M_compHyperGraph::print() const {
 }
 
 
-void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge
+void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge* > edge
 /*comes from the list head->isHeadOf*/, std::shared_ptr<Vertex> to) {
     DirectedHyperEdge* newEdge = edge.getData();
     std::shared_ptr<Vertex> from = newEdge->getHead();
@@ -30,7 +30,7 @@ std::map<int, bool> M_compHyperGraph::getSameComponentVector(std::shared_ptr<Ver
         Running time is O(|V|) by Lemma 3.1
     */
     std::map<int, bool> c_v;
-    for (HyperEdge* undHyperEdge : undirectedHyperEdges) {
+    for (std::shared_ptr<HyperEdge> undHyperEdge : undirectedHyperEdges) {
         if (undHyperEdge->isStillExistsing() && !isTrivial(undHyperEdge)) {
             // no need for already deleted or trivial M-components
             bool isVIn = false;
@@ -50,7 +50,7 @@ std::map<int, bool> M_compHyperGraph::getSameComponentVector(std::shared_ptr<Ver
 }
 
 bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2) {
-    for (HyperEdge* h : undirectedHyperEdges) {  // O(n)
+    for (std::shared_ptr<HyperEdge> h : undirectedHyperEdges) {  // O(n)
         setUsedInThisDFS(h, false);
     }
     for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {  // O(n)
@@ -72,14 +72,14 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
             // turn around and return
             std::shared_ptr<Vertex> v = actualVertex;
             do {
-                Node<DirectedHyperEdge*> comeFrom = getIncomingHyperedge(actualVertex);
+                Node<DirectedHyperEdge* > comeFrom = getIncomingHyperedge(actualVertex);
                 v = comeFrom.getData()->getHead();
                 changeDirection(comeFrom, actualVertex);
                 actualVertex = v;
             } while ( !((*actualVertex == *v1) || (*actualVertex == *v2)) );
             return true;
         } else {
-            Node<DirectedHyperEdge*>* node = actualVertex->isHeadOf()->getFirst();
+            Node<DirectedHyperEdge* >* node = actualVertex->isHeadOf()->getFirst();
             while (node != NULL) {
                 DirectedHyperEdge* dirEdge = node->getData();
                 if (!isUsedInThisDFS(dirEdge->getHyperEdge())) {
@@ -145,7 +145,8 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                 std::vector<std::shared_ptr<Vertex> > T = getT(v, neighbor);
 
                 if (T.empty()) {  // you can add one edge
-                    HyperEdge * newHyperEgde = new HyperEdge({v, neighbor});
+                    std::shared_ptr<HyperEdge> newHyperEgde =
+                        std::make_shared<HyperEdge>(std::vector<std::shared_ptr<Vertex> >({v, neighbor}));
                     setTrivial(newHyperEgde, true);  // this is a new edge, that is trivial
                     SpanningGraph.addEdge(v->getId(), neighbor->getId());
                     if (v->getInDegree() < neighbor->getInDegree()) {
@@ -155,9 +156,9 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                     }
                     continue;
                 } else {
-                    undirectedHyperEdges.push_back(new HyperEdge(T));
+                    undirectedHyperEdges.push_back(std::make_shared<HyperEdge>(T));
                     setTrivial(undirectedHyperEdges.back(), false);  // this is not trivial hyperegde
-                    HyperEdge * newHyperEgde = undirectedHyperEdges.back();
+                    std::shared_ptr<HyperEdge> newHyperEgde = undirectedHyperEdges.back();
                     for (DirectedHyperEdge& hyperEdge : directedHyperEdges) {
                         if (isUsedInThisDFS(hyperEdge.getHyperEdge())) {
                             hyperEdge.changeUnderlyingEdge(newHyperEgde);

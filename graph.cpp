@@ -20,14 +20,14 @@ void DirectedHyperGraph::print() const {
     }
 }
 
-void DirectedHyperEdge::changeUnderlyingEdge(HyperEdge* newHyperEdge) {
+void DirectedHyperEdge::changeUnderlyingEdge(std::shared_ptr<HyperEdge> newHyperEdge) {
     hyperEdge->setStillExistsing(false);
     newHyperEdge->setStillExistsing(true);
     hyperEdge = newHyperEdge;
 }
 
 
-void DirectedHyperGraph::addHyperEdge(HyperEdge* edge,  std::shared_ptr<Vertex>  head) {
+void DirectedHyperGraph::addHyperEdge(std::shared_ptr<HyperEdge> edge,  std::shared_ptr<Vertex>  head) {
     /* 
     Ads undirected hyperedge every time if it encounters for every "inMcomp"
     */
@@ -42,7 +42,7 @@ void DirectedHyperGraph::addDirEdge(std::shared_ptr<Vertex>  head, std::shared_p
     Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
     */
     std::vector<std::shared_ptr<Vertex> > vertices = {head, tail};
-    undirectedHyperEdges.push_back(new HyperEdge(vertices));
+    undirectedHyperEdges.push_back(std::make_shared<HyperEdge>(vertices));
     directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
     head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
@@ -71,7 +71,7 @@ void DirectedHyperGraph::readFromInput() {
                 h = v;
             std::cin >> v;
         }
-        HyperEdge* newHyperEgde = new HyperEdge(edgeVertices);
+        std::shared_ptr<HyperEdge> newHyperEgde = std::make_shared<HyperEdge>(edgeVertices);
         addHyperEdge(newHyperEgde, vertices[h]);
     }
 }
