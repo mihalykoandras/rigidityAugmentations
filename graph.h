@@ -87,15 +87,15 @@ class SimpleGraph {
  private:
     int numberOfVertices;
     std::vector<Edge> edgeList;
-    std::vector<std::vector<int> > neighborLists;
+    std::map<int, std::vector<int> > neighborLists;
 
  public:
     SimpleGraph() {}
     explicit SimpleGraph(int n) : numberOfVertices(n) {
-        neighborLists = std::vector<std::vector<int> >(numberOfVertices);}
+        neighborLists = std::map<int, std::vector<int> >();}
     SimpleGraph(int n, const std::vector<int>& I, const std::vector<int>& J) {
         numberOfVertices = n;
-        neighborLists = std::vector<std::vector<int> >(numberOfVertices);
+        neighborLists = std::map<int, std::vector<int> >();
 
         if (I.size() == J.size()) {
             for (int i = 0; i < I.size(); i++) {
@@ -117,7 +117,7 @@ class SimpleGraph {
     }
     inline size_t getNumberOfEdges() const {return edgeList.size();}
     std::vector<Edge> getEdges() const {return edgeList;}
-    std::vector<int> getNeighbors(int i) const {return neighborLists[i];}
+    std::vector<int> getNeighbors(int i) {return neighborLists[i];}
 
     void readFromInput();
 };
@@ -157,17 +157,6 @@ class Vertex {
             }
         inline void increaseInDegree() {inDegree++;}
         inline List<DirectedHyperEdge*>* isHeadOf() {return &headOfHyperEdge;}
-
-        /* 
-        inline bool isMarked() const {return mark;}
-        inline void setMark(bool flag) {mark = flag;}
-        inline bool isUsedForStar() const {return usedForStar;}
-        inline void setUsedForStar(bool flag) {usedForStar = flag;}
-        inline Node<DirectedHyperEdge*> getFrom() {return comeFrom;}
-        inline void setIncomingHyperedge(Node<DirectedHyperEdge*> from) {comeFrom = from;}
-        */
-
-
         inline void print() const {
                 std::cout << id;
         }
@@ -230,12 +219,14 @@ class DirectedHyperEdge {
 
 class DirectedHyperGraph {
     /*
-        This class contains all data: vertices, hyperedges, directions, directions
-        It does not implement any funcionality over the basics, that is for the M_comp_Hyper_Graph class
+        Class for directed hypergraph. Every hyperedge has one head and multiple tail.
+        It does not implement any funcionality over the basics.
+        Funconalities regarding (k,l)-sparsity concern the M_compHyperGraph class
     */
  protected:
         std::map<int, Vertex*> vertices;  // key is the ID of the vertex
         std::list<DirectedHyperEdge> directedHyperEdges;
+        // this does not need to be pointer, as it contains just two pointers itself
         std::list<HyperEdge*> undirectedHyperEdges;
 
         size_t size;
@@ -258,11 +249,7 @@ class DirectedHyperGraph {
                 std::vector<int> edge = e.getEdge();
                 insertNewVertex(edge[0]);
                 insertNewVertex(edge[1]);
-                std::vector<Vertex*> edgeVertices = {&vertices[edge[0]], &vertices[edge[1]]};
-
-                HyperEdge* newHyperEgde = new HyperEdge(edgeVertices);
-
-                addHyperEdge(newHyperEgde, vertices[edge[0]]);
+                addDirEdge(vertices[edge[0]], vertices[edge[1]]);
             }
         }
 
@@ -291,9 +278,9 @@ class DirectedHyperGraph {
         inline Vertex * getVertex(int i) {return vertices[i];}
         inline std::list<HyperEdge*>* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
 
-        void addHyperEdge(HyperEdge* edge, Vertex * head);
+        void addHyperEdge(HyperEdge* edge, Vertex * head);  // not used in this codebase, but maybe later
+        void addDirEdge(Vertex * head, Vertex * tail);
         void changeDirection(DirectedHyperEdge& edge, Vertex * to);
-
 
         void readFromInput();
         void print() const;

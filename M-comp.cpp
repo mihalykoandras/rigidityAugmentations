@@ -10,27 +10,6 @@ void M_compHyperGraph::print() const {
     DirectedHyperGraph::print();
 }
 
-void M_compHyperGraph::addHyperEdge(HyperEdge* edge,  Vertex * head) {
-    /* 
-    Ads undirected hyperedge every time if it encounters for every "inMcomp"
-    */
-    undirectedHyperEdges.push_back(edge);
-    directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
-    head->isHeadOf()->push_front(&directedHyperEdges.back());
-    head->increaseInDegree();
-}
-
-void M_compHyperGraph::addDirEdge(Vertex * head, Vertex * tail) {
-    /* 
-    Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
-    */
-    std::vector<Vertex *> vertices = {head, tail};
-    undirectedHyperEdges.push_back(new HyperEdge(vertices, true));
-    directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
-    head->isHeadOf()->push_front(&directedHyperEdges.back());
-    head->increaseInDegree();
-}
-
 
 void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge
 /*comes from the list head->isHeadOf*/, Vertex * to) {
@@ -46,12 +25,11 @@ void M_compHyperGraph::changeDirection(Node<DirectedHyperEdge*> edge
 }
 
 
-
-std::vector<bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
+std::map<int, bool> M_compHyperGraph::getSameComponentVector(Vertex * v) {
     /*
         Running time is O(|V|) by Lemma 3.1
     */
-    std::vector<bool> c_v(getNumberOfVertices(), 0);
+    std::map<int, bool> c_v;
     for (HyperEdge* undHyperEdge : undirectedHyperEdges) {
         if (undHyperEdge->isStillExistsing() && !undHyperEdge->isTrivial()) {
             // no need for already deleted or trivial M-components
@@ -146,18 +124,19 @@ std::vector<Vertex *> M_compHyperGraph::getT(Vertex * v1, Vertex * v2) {
 
 
 
-void M_compHyperGraph::MakeMCompHypergraph(const SimpleGraph& G) {
+void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
     if (G.getNumberOfEdges() != 0) {
         SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
             Vertex * v = getVertex(i);
-            std::vector<bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
+            std::map<int, bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
             std::vector<int> neighborIds = G.getNeighbors(v->getId());
 
             for (int neighborId : neighborIds) {
                 Vertex * neighbor = getVertex(neighborId);
 
-                if (v->getId() < neighbor->getId()) {  // not to add two times
+                if (v < neighbor) {  // not to add two times
+                // Gprime is jut a check, it could be deleted for faster run
                     Gprime.addEdge(v->getId(), neighbor->getId());
                 }
                 if (inTheSameM_componentWith_i[neighbor->getId()])

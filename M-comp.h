@@ -40,7 +40,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
         setIncomingHyperedge(v->getId(), from);
     }
 
-    std::vector<bool> getSameComponentVector(Vertex * v);
+    std::map<int, bool> getSameComponentVector(Vertex * v);
     bool DFS(Vertex * v1, Vertex * v2);
 
  public:
@@ -64,8 +64,6 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
     ~M_compHyperGraph() {}
 
-    void addHyperEdge(HyperEdge* edge, Vertex * head);  // never used
-    void addDirEdge(Vertex * head, Vertex * tail);
     void changeDirection(Node<DirectedHyperEdge*> edge, Vertex * to);
 
     bool isRigid() const {return SpanningGraph.getEdges().size() == k* getNumberOfVertices() - ell;}
@@ -73,7 +71,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
     std::vector<Vertex*> getT(Vertex * v1, Vertex * v2);
     std::vector<Vertex*> getT(int i, int j) {return getT(vertices[i], vertices[j]);}
 
-    void MakeMCompHypergraph(const SimpleGraph& G);
+    void MakeMCompHypergraph(SimpleGraph& G);
 
     void print() const;
 };

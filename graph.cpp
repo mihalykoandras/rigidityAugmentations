@@ -2,7 +2,6 @@
 
 void SimpleGraph::readFromInput() {
     std::cin >> numberOfVertices;
-    neighborLists = std::vector<std::vector<int> >(numberOfVertices);
     int numbOfEdges;
     std::cin >> numbOfEdges;
     for (int i = 0; i < numbOfEdges; i++) {
@@ -29,8 +28,23 @@ void DirectedHyperEdge::changeUnderlyingEdge(HyperEdge* newHyperEdge) {
 
 
 void DirectedHyperGraph::addHyperEdge(HyperEdge* edge,  Vertex * head) {
+    /* 
+    Ads undirected hyperedge every time if it encounters for every "inMcomp"
+    */
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
+    head->isHeadOf()->push_front(&directedHyperEdges.back());
+    head->increaseInDegree();
+}
+
+void DirectedHyperGraph::addDirEdge(Vertex * head, Vertex * tail) {
+    /* 
+    Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
+    */
+    std::vector<Vertex *> vertices = {head, tail};
+    undirectedHyperEdges.push_back(new HyperEdge(vertices, true));
+    directedHyperEdges.emplace_back(head, undirectedHyperEdges.back());
+    head->isHeadOf()->push_front(&directedHyperEdges.back());
     head->increaseInDegree();
 }
 
@@ -57,7 +71,7 @@ void DirectedHyperGraph::readFromInput() {
                 h = v;
             std::cin >> v;
         }
-        HyperEdge* newHyperEgde= new HyperEdge(edgeVertices);
+        HyperEdge* newHyperEgde = new HyperEdge(edgeVertices);
         addHyperEdge(newHyperEgde, vertices[h]);
     }
 }
