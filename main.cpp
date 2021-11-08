@@ -23,9 +23,9 @@ int main(int argc, char *argv[]) {
 
     RedundHyperGraph R(HG);
 
-    std::vector<Vertex *> P = R.findTransversal();
+    std::vector<std::shared_ptr<Vertex> > P = R.findTransversal();
     std::cout << "Transversal of the MCT sets of the M-comp hypergraph\n";
-    for (Vertex * v : P) {
+    for (std::shared_ptr<Vertex> v : P) {
          v->print();
          std::cout << " ";
     }

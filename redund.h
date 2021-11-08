@@ -17,28 +17,28 @@ class RedundHyperGraph : public M_compHyperGraph {
     std::map<int, bool> marked;
     std::map<int, bool> usedForStar;
 
-    Vertex * findLowDegreeVertex();
-    void markOneTight(Vertex * head, Vertex * j);
-    bool isWholeSized(const std::vector<Vertex* >& V) const {return V.size() == size;}
-    std::vector<Vertex*> StarSearch(Vertex * i, std::vector<Vertex*> L);
-    bool threeInTwo(const std::vector<Vertex* >& T1, const std::vector<Vertex* >& T2, const std::vector<Vertex* >& T3,
-    const std::vector<Vertex* >& L1, const std::vector<Vertex* >& L2) const;
+    std::shared_ptr<Vertex> findLowDegreeVertex();
+    void markOneTight(std::shared_ptr<Vertex> head, std::shared_ptr<Vertex> j);
+    bool isWholeSized(const std::vector<std::shared_ptr<Vertex> >& V) const {return V.size() == size;}
+    std::vector<std::shared_ptr<Vertex> > StarSearch(std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L);
+    bool threeInTwo(const std::vector<std::shared_ptr<Vertex> >& T1, const std::vector<std::shared_ptr<Vertex> >& T2, const std::vector<std::shared_ptr<Vertex> >& T3,
+    const std::vector<std::shared_ptr<Vertex> >& L1, const std::vector<std::shared_ptr<Vertex> >& L2) const;
 
 
     inline bool isMarked(int id) {return marked[id];}
     inline bool isMarked(const Vertex& v) {return isMarked(v.getId());}
-    inline bool isMarked(const Vertex* v) {return isMarked(v->getId());}
+    inline bool isMarked(const std::shared_ptr<Vertex> v) {return isMarked(v->getId());}
 
     inline void setMark(int id, bool flag) {marked[id] = flag;}
-    inline void setMark(const Vertex * v, bool flag) {setMark(v->getId(), flag);}
+    inline void setMark(const std::shared_ptr<Vertex> v, bool flag) {setMark(v->getId(), flag);}
     inline void setMark(const Vertex& v, bool flag) {setMark(v.getId(), flag);}
 
     inline bool isUsedForStar(int id) {return usedForStar[id];}
     inline bool isUsedForStar(const Vertex& v) {return isUsedForStar(v.getId());}
-    inline bool isUsedForStar(const Vertex* v) {return isUsedForStar(v->getId());}
+    inline bool isUsedForStar(const std::shared_ptr<Vertex> v) {return isUsedForStar(v->getId());}
 
     inline void setUsedForStar(int id, bool used) {usedForStar[id] = used;}
-    inline void setUsedForStar(const Vertex * v, bool used) {setUsedForStar(v->getId(), used);}
+    inline void setUsedForStar(const std::shared_ptr<Vertex> v, bool used) {setUsedForStar(v->getId(), used);}
     inline void setUsedForStar(const Vertex& v, bool used) {setUsedForStar(v.getId(), used);}
 
  public:
@@ -54,7 +54,7 @@ class RedundHyperGraph : public M_compHyperGraph {
 
 
     ~RedundHyperGraph() {}
-    std::vector<Vertex *> findTransversal(std::vector<Vertex *> L = std::vector<Vertex *>());
+    std::vector<std::shared_ptr<Vertex> > findTransversal(std::vector<std::shared_ptr<Vertex> > L = std::vector<std::shared_ptr<Vertex> >());
     std::vector<Edge> toRedund();
 };
 

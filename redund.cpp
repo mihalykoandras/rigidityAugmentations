@@ -7,9 +7,9 @@
 
 
 
-void RedundHyperGraph::markOneTight(Vertex * head, Vertex * j) {
-    std::vector<Vertex *> Tij = getT(head, j);
-    for (Vertex* v : Tij) {
+void RedundHyperGraph::markOneTight(std::shared_ptr<Vertex> head, std::shared_ptr<Vertex> j) {
+    std::vector<std::shared_ptr<Vertex> > Tij = getT(head, j);
+    for (std::shared_ptr<Vertex> v : Tij) {
         setMark(v, true);
         setUsedForStar(v, false);
     }
@@ -17,29 +17,29 @@ void RedundHyperGraph::markOneTight(Vertex * head, Vertex * j) {
 }
 
 
-std::vector<Vertex *> RedundHyperGraph::StarSearch(Vertex * i, std::vector<Vertex *> L = std::vector<Vertex *>()) {
+std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::StarSearch(std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L = std::vector<std::shared_ptr<Vertex> >()) {
     //    Algorithm 4.4 in the paper
     //    O(|V|^2)
 
-    for (std::pair<const int, Vertex* > & v : vertices) {
+    for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
         setMark(v.second, false);
         setUsedForStar(v.second, false);
     }
 
     setMark(i, true);
-    for (Vertex* j : L) {
+    for (std::shared_ptr<Vertex> j : L) {
         if (!isMarked(j)) {
             markOneTight(i, j);
         }
     }
 
-    for (std::pair<const int, Vertex* > & v : vertices) {
+    for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
         if (!isMarked(v.second)) {
             markOneTight(i, v.second);
         }
     }
-    std::vector<Vertex *> P(0);
-    for (std::pair<const int, Vertex* > & v : vertices) {
+    std::vector<std::shared_ptr<Vertex> > P(0);
+    for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
         if (isUsedForStar(v.second)) {
             P.push_back(v.second);
         }
@@ -47,7 +47,7 @@ std::vector<Vertex *> RedundHyperGraph::StarSearch(Vertex * i, std::vector<Verte
     return P;
 }
 
-Vertex * RedundHyperGraph::findLowDegreeVertex() {
+std::shared_ptr<Vertex> RedundHyperGraph::findLowDegreeVertex() {
     std::vector<int> degree(getNumberOfVertices(), 0);
     for (auto& edge : SpanningGraph.getEdges()) {
         degree[edge.getEdge()[0]]++;
@@ -60,25 +60,25 @@ Vertex * RedundHyperGraph::findLowDegreeVertex() {
 }
 
 
-std::vector<Vertex *> RedundHyperGraph::findTransversal(std::vector<Vertex *> L) {
+std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vector<std::shared_ptr<Vertex> > L) {
     if (isRigid()) {
-    Vertex * i = findLowDegreeVertex();
-    std::vector<Vertex *> ViL = StarSearch(i, L);
+    std::shared_ptr<Vertex> i = findLowDegreeVertex();
+    std::vector<std::shared_ptr<Vertex> > ViL = StarSearch(i, L);
     if (ViL.size() == 1) {
         ViL.push_back(i);
         return ViL;
     }
     if (ViL.size() == 2) {
-        for (std::pair<const int, Vertex* > & v : vertices) {
+        for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
             if (isWholeSized(getT(ViL[0], v.second))) {
-                return std::vector<Vertex *>{ViL[0], v.second};
+                return std::vector<std::shared_ptr<Vertex> >{ViL[0], v.second};
             }
             if (isWholeSized(getT(ViL[1], v.second))) {
-                return std::vector<Vertex *>{ViL[1], v.second};
+                return std::vector<std::shared_ptr<Vertex> >{ViL[1], v.second};
             }
         }
     }
-    std::vector<Vertex *> P = StarSearch(ViL[0], L);
+    std::vector<std::shared_ptr<Vertex> > P = StarSearch(ViL[0], L);
     P.push_back(ViL[0]);
     if (P.size() < 2) {
         std::cerr << "Too small transversal" << std::endl;
@@ -86,30 +86,30 @@ std::vector<Vertex *> RedundHyperGraph::findTransversal(std::vector<Vertex *> L)
     return P;
     } else {
         std::cerr << "G is not rigid" <<std::endl;
-        return  std::vector<Vertex *>();
+        return  std::vector<std::shared_ptr<Vertex> >();
     }
 }
 
 bool RedundHyperGraph::threeInTwo(
-    const std::vector<Vertex* >& T1, const std::vector<Vertex* >& T2, const std::vector<Vertex* >& T3,
-    const std::vector<Vertex* >& L1, const std::vector<Vertex* >& L2) const {  // O(|V|)
+    const std::vector<std::shared_ptr<Vertex> >& T1, const std::vector<std::shared_ptr<Vertex> >& T2, const std::vector<std::shared_ptr<Vertex> >& T3,
+    const std::vector<std::shared_ptr<Vertex> >& L1, const std::vector<std::shared_ptr<Vertex> >& L2) const {  // O(|V|)
         std::vector<bool> isIn(getNumberOfVertices(), false);
-        for (Vertex * v : L1) {
+        for (std::shared_ptr<Vertex> v : L1) {
             isIn[v->getId()] = true;
         }
-        for (Vertex * v : L2) {
+        for (std::shared_ptr<Vertex> v : L2) {
             isIn[v->getId()] = true;
         }
 
-        for (Vertex * v : T1) {
+        for (std::shared_ptr<Vertex> v : T1) {
             if (!isIn[v->getId()])
                 return false;
         }
-        for (Vertex * v : T2) {
+        for (std::shared_ptr<Vertex> v : T2) {
             if (!isIn[v->getId()])
                 return false;
         }
-        for (Vertex * v : T3) {
+        for (std::shared_ptr<Vertex> v : T3) {
             if (!isIn[v->getId()])
                 return false;
         }
@@ -122,20 +122,20 @@ std::vector<Edge> RedundHyperGraph::toRedund() {
         return std::vector<Edge>();
     }
     if (isRigid()) {
-    std::vector<Vertex *> P = findTransversal();
+    std::vector<std::shared_ptr<Vertex> > P = findTransversal();
     if (P.size() < 2) {
         return std::vector<Edge>();
     }
     std::vector<Edge> F;
     while (P.size() >= 4) {
-        Vertex * i_1 = P[0];
-        Vertex * i_h = P[P.size()-1];
-        Vertex * i_h1 = P[P.size()-2];
-        Vertex * i_h2 = P[P.size()-3];
-        std::vector<Vertex* > T_1_h2 = getT(i_1, i_h2);
-        std::vector<Vertex* > T_1_h1 = getT(i_1, i_h1);
-        std::vector<Vertex* > T_1_h = getT(i_1, i_h);
-        std::vector<Vertex* > T_h_h1 = getT(i_h, i_h1);
+        std::shared_ptr<Vertex> i_1 = P[0];
+        std::shared_ptr<Vertex> i_h = P[P.size()-1];
+        std::shared_ptr<Vertex> i_h1 = P[P.size()-2];
+        std::shared_ptr<Vertex> i_h2 = P[P.size()-3];
+        std::vector<std::shared_ptr<Vertex> > T_1_h2 = getT(i_1, i_h2);
+        std::vector<std::shared_ptr<Vertex> > T_1_h1 = getT(i_1, i_h1);
+        std::vector<std::shared_ptr<Vertex> > T_1_h = getT(i_1, i_h);
+        std::vector<std::shared_ptr<Vertex> > T_h_h1 = getT(i_h, i_h1);
 
         if (threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h2, T_h_h1)) {
             F.emplace_back(i_h1->getId(), i_h->getId());

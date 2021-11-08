@@ -5,6 +5,7 @@
 #include <list>
 #include <iostream>
 #include <map>
+#include <memory>
 
 template<typename T>class Node{
  private:
@@ -164,16 +165,16 @@ class Vertex {
 
 class HyperEdge {
  protected:
-        std::vector<Vertex*> vertices;
+        std::vector<std::shared_ptr<Vertex> > vertices;
         bool stillExistsing;  // we don't delete the hyperedges that are now part of a bigger M-comp,
                               // just note that they are not useful any more
 
  public:
-        explicit HyperEdge(const std::vector<Vertex*>& v_) : vertices(v_) { stillExistsing = true;}
+        explicit HyperEdge(const std::vector<std::shared_ptr<Vertex> >& v_) : vertices(v_) { stillExistsing = true;}
 
         ~HyperEdge() {}
 
-        inline std::vector<Vertex*> getVertices() const {return vertices;}
+        inline std::vector<std::shared_ptr<Vertex> > getVertices() const {return vertices;}
         inline void print() const {
             for (const auto& v : vertices) {
                     v->print();
@@ -188,15 +189,15 @@ class HyperEdge {
 class DirectedHyperEdge {
  private:
         HyperEdge *hyperEdge;
-        Vertex * head;
+        std::shared_ptr<Vertex> head;
 
  public:
         DirectedHyperEdge() {}
-        DirectedHyperEdge(Vertex * head_, HyperEdge* hyperedge_)
+        DirectedHyperEdge(std::shared_ptr<Vertex> head_, HyperEdge* hyperedge_)
          : head(head_), hyperEdge(hyperedge_) {}
         ~DirectedHyperEdge() {}
-        inline Vertex * getHead() const {return head;}
-        inline void setHead(Vertex* v) {head = v;}
+        inline std::shared_ptr<Vertex> getHead() const {return head;}
+        inline void setHead(std::shared_ptr<Vertex> v) {head = v;}
         inline HyperEdge * getHyperEdge() {return hyperEdge;}
         void changeUnderlyingEdge(HyperEdge* hyperEdge_);
 
@@ -216,7 +217,7 @@ class DirectedHyperGraph {
         Funconalities regarding (k,l)-sparsity concern the M_compHyperGraph class
     */
  protected:
-        std::map<int, Vertex*> vertices;  // key is the ID of the vertex
+        std::map<int, std::shared_ptr<Vertex> > vertices;  // key is the ID of the vertex
         std::list<DirectedHyperEdge> directedHyperEdges;
         // this does not need to be pointer, as it contains just two pointers itself
         std::list<HyperEdge*> undirectedHyperEdges;
@@ -258,7 +259,7 @@ class DirectedHyperGraph {
 
         void inline insertNewVertex(int id) {  // insert new vertex only if id is not contained
             if (vertices.find(id) == vertices.end()) {
-                    vertices[id] = new Vertex(id);
+                    vertices[id] = std::make_shared<Vertex>(id);
                 }
         }
 
@@ -266,12 +267,12 @@ class DirectedHyperGraph {
         inline size_t getNumberOfEdges() const {return directedHyperEdges.size();}
 
 
-        inline Vertex * getVertex(int i) {return vertices[i];}
+        inline std::shared_ptr<Vertex> getVertex(int i) {return vertices[i];}
         inline std::list<HyperEdge*>* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
 
-        void addHyperEdge(HyperEdge* edge, Vertex * head);
-        void addDirEdge(Vertex * head, Vertex * tail);
-        void changeDirection(DirectedHyperEdge& edge, Vertex * to);
+        void addHyperEdge(HyperEdge* edge, std::shared_ptr<Vertex> head);
+        void addDirEdge(std::shared_ptr<Vertex> head, std::shared_ptr<Vertex> tail);
+        void changeDirection(DirectedHyperEdge& edge, std::shared_ptr<Vertex> to);
 
         void readFromInput();
         void print() const;
