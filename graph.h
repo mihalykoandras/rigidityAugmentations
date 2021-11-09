@@ -119,7 +119,11 @@ class HyperEdge {
  public:
         explicit HyperEdge(const std::vector<std::shared_ptr<Vertex> >& v_) : vertices(v_) { stillExistsing = true;}
 
-        ~HyperEdge() {}
+        ~HyperEdge() {
+            for (auto& v : vertices) {
+                v.reset();
+            }
+        }
 
         inline std::vector<std::shared_ptr<Vertex> > getVertices() const {return vertices;}
         inline void print() const {
