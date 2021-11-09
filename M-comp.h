@@ -69,12 +69,13 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
     M_compHyperGraph(size_t n, unsigned int k_, int ell_) {
         // 0 < k and 0 < ell <2k
-        if (k <= 0 || ell <=0 || ell >= 2*k) {
-            std::cerr << "Bad constraints for k and ell, it works only if 0 < k and 0 < ell < 2k";
-            throw 20;
-        }
         k = k_;
         ell = ell_;
+
+        if (k <= 0 || ell <=0 || ell >= 2*k) {
+            std::cerr << "Bad constraints for k and ell, it works only if 0 < k and 0 < ell < 2k" << std::endl;
+            throw 20;
+        }
         size = n;
         SpanningGraph = SimpleGraph(size);
         for (size_t i = 0; i < size; i++) {
