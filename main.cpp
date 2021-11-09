@@ -32,9 +32,23 @@ int main(int argc, char *argv[]) {
     }
 
     SimpleGraph G;
-    G.readFromInput();
 
-    M_compHyperGraph HG(G.getNumberOfNodes(), k, ell);
+    try {
+        G.readFromInput();
+    } catch (int e) {
+        std::cerr <<"Error code " << e << std::endl;
+        return e;
+    }
+
+    M_compHyperGraph HG;
+
+    try {
+        HG = M_compHyperGraph(G.getNumberOfNodes(), k, ell);
+    } catch (int e) {
+        std::cerr <<"Error code " << e << std::endl;
+        return e;
+    }
+
     HG.MakeMCompHypergraph(G);
     HG.print();
 

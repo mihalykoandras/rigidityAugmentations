@@ -11,6 +11,10 @@ void SimpleGraph::readFromInput() {
     for (int i = 0; i < numbOfEdges; i++) {
         int a, b;
         std::cin >> a >> b;
+        if (a == b) {
+            std::cerr << "No loop edges are allowed." << std::endl;
+            throw 12;
+        }
         addEdge(a, b);
     }
 }

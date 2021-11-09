@@ -65,7 +65,14 @@ class M_compHyperGraph : public DirectedHyperGraph {
     bool DFS(std::shared_ptr<Vertex>  v1, std::shared_ptr<Vertex>  v2);
 
  public:
+    M_compHyperGraph() {}
+
     M_compHyperGraph(size_t n, unsigned int k_, int ell_) {
+        // 0 < k and 0 < ell <2k
+        if (k <= 0 || ell <=0 || ell >= 2*k) {
+            std::cerr << "Bad constraints for k and ell, it works only if 0 < k and 0 < ell < 2k";
+            throw 20;
+        }
         k = k_;
         ell = ell_;
         size = n;
