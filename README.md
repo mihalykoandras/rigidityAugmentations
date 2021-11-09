@@ -7,8 +7,7 @@ O(|V|^2+|E|) time.
 ### Theory
 
 The theoretical background of these algorithms is presented in the papers [Sparse graphs and an augmentation problem](https://link.springer.com/article/10.1007/s10107-021-01689-0) 
-and [Glabally rigid augmentation of rigid graphs](https://web.cs.elte.hu/egres/tr/egres-21-04.pdf) Section 3. This implementation will be desribed in details in a new upcoming paper 
-by the same authors.  
+and [Globally rigid augmentation of rigid graphs](https://web.cs.elte.hu/egres/tr/egres-21-04.pdf) Section 3. This implementation will be desribed in details in an upcoming paper by the same authors.  
 
 ### Usage
 
