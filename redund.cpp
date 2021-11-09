@@ -1,5 +1,6 @@
-#include <utility>
+// Copyright 2021 András Mihálykó MIT License
 
+#include <utility>
 
 #include "graph.h"
 #include "M-comp.h"
@@ -17,9 +18,9 @@ void RedundHyperGraph::markOneTight(std::shared_ptr<Vertex> head, std::shared_pt
 }
 
 
-std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::StarSearch(std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L = std::vector<std::shared_ptr<Vertex> >()) {
-    //    Algorithm 4.4 in the paper
-    //    O(|V|^2)
+std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::StarSearch(
+    std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L = std::vector<std::shared_ptr<Vertex> >()) {
+    // Running time: O(|V|^2)
 
     for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
         setMark(v.second, false);
@@ -91,8 +92,10 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vec
 }
 
 bool RedundHyperGraph::threeInTwo(
-    const std::vector<std::shared_ptr<Vertex> >& T1, const std::vector<std::shared_ptr<Vertex> >& T2, const std::vector<std::shared_ptr<Vertex> >& T3,
-    const std::vector<std::shared_ptr<Vertex> >& L1, const std::vector<std::shared_ptr<Vertex> >& L2) const {  // O(|V|)
+    const std::vector<std::shared_ptr<Vertex> >& T1, const std::vector<std::shared_ptr<Vertex> >& T2,
+    const std::vector<std::shared_ptr<Vertex> >& T3, const std::vector<std::shared_ptr<Vertex> >& L1,
+    const std::vector<std::shared_ptr<Vertex> >& L2) const {  
+        // Running time: O(|V|)
         std::vector<bool> isIn(getNumberOfVertices(), false);
         for (std::shared_ptr<Vertex> v : L1) {
             isIn[v->getId()] = true;

@@ -1,3 +1,5 @@
+// Copyright 2021 András Mihálykó MIT License
+
 #include <queue>
 #include <utility>
 

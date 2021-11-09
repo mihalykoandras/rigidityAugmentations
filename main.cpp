@@ -1,3 +1,11 @@
+// Copyright 2021 András Mihálykó MIT License
+/*
+    Driver program for M-component hypergraph creation,
+    finding transversal vertices of the MCT sets and 
+    adding minimal number of edges so that G becomes M-connected. 
+    If G is (k,l)-tight, this latter adds the minimal number of edges to
+    make G (k,l)-redundant.
+*/
 #include "graph.h"
 #include "M-comp.h"
 #include "redund.h"

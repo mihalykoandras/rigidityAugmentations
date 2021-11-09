@@ -1,5 +1,6 @@
-#ifndef GRAPH_H_
-#define GRAPH_H_
+// Copyright 2021 András Mihálykó MIT License
+
+#pragma once
 
 #include <vector>
 #include <list>
@@ -285,4 +286,4 @@ class DirectedHyperGraph {
         void readFromInput();
         void print() const;
 };
-#endif  // GRAPH_H_
+

@@ -1,5 +1,6 @@
-#ifndef REDUND_H_
-#define REDUND_H_
+// Copyright 2021 András Mihálykó MIT License
+
+#pragma once
 
 #include <vector>
 #include <map>
@@ -22,9 +23,13 @@ class RedundHyperGraph : public M_compHyperGraph {
     std::shared_ptr<Vertex> findLowDegreeVertex();
     void markOneTight(std::shared_ptr<Vertex> head, std::shared_ptr<Vertex> j);
     bool isWholeSized(const std::vector<std::shared_ptr<Vertex> >& V) const {return V.size() == size;}
-    std::vector<std::shared_ptr<Vertex> > StarSearch(std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L);
-    bool threeInTwo(const std::vector<std::shared_ptr<Vertex> >& T1, const std::vector<std::shared_ptr<Vertex> >& T2, const std::vector<std::shared_ptr<Vertex> >& T3,
-    const std::vector<std::shared_ptr<Vertex> >& L1, const std::vector<std::shared_ptr<Vertex> >& L2) const;
+    std::vector<std::shared_ptr<Vertex> > StarSearch(
+        std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L);
+        // Algorithm 4.6
+    bool threeInTwo(const std::vector<std::shared_ptr<Vertex> >& T1,
+        const std::vector<std::shared_ptr<Vertex> >& T2, const std::vector<std::shared_ptr<Vertex> >& T3,
+        const std::vector<std::shared_ptr<Vertex> >& L1, const std::vector<std::shared_ptr<Vertex> >& L2) const;
+        // utility function for Algorithm 4.14
 
 
     inline bool isMarked(int id) {return marked[id];}
@@ -56,8 +61,8 @@ class RedundHyperGraph : public M_compHyperGraph {
 
 
     ~RedundHyperGraph() {}
-    std::vector<std::shared_ptr<Vertex> > findTransversal(std::vector<std::shared_ptr<Vertex> > L = std::vector<std::shared_ptr<Vertex> >());
-    std::vector<Edge> toRedund();
+    std::vector<std::shared_ptr<Vertex> > findTransversal(
+        std::vector<std::shared_ptr<Vertex> > L = std::vector<std::shared_ptr<Vertex> >());
+        // Algorithm 4.12
+    std::vector<Edge> toRedund();  // Algorithm 4.14
 };
-
-#endif  // REDUND_H_

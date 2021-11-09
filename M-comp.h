@@ -1,5 +1,6 @@
-#ifndef M_COMP_H_
-#define M_COMP_H_
+// Copyright 2021 András Mihálykó MIT License
+
+#pragma once
 
 #include <vector>
 #include <list>
@@ -10,6 +11,11 @@
 
 
 class M_compHyperGraph : public DirectedHyperGraph {
+/*
+    Class of directed graph that will find an optimal direction and
+    with that a maximal (k,l)-sparse subgraph. This class can return the
+    M-comp hypergraph of G. 
+*/
  protected:
     unsigned int k;
     int ell;
@@ -19,11 +25,11 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
  private:
     std::map<int, bool> vertexUsedInDFS;  // key is the id of the vertex
-    std::map<int, Node<std::shared_ptr<DirectedHyperEdge> > > comeFrom;  // contains the list of hyperedges needed to get to this node
+    std::map<int, Node<std::shared_ptr<DirectedHyperEdge> > > comeFrom;
+        // contains the list of hyperedges needed to get to this node
     std::map<std::shared_ptr<HyperEdge>, bool> hyperedgeUsedInDFS;
-    std::map<std::shared_ptr<HyperEdge>, bool> trivial;  // if it is underlying hyperedge for a non-trivial M-component or not
-
-
+    std::map<std::shared_ptr<HyperEdge>, bool> trivial;
+        // if it is underlying hyperedge for a non-trivial M-component or not
 
     inline bool isUsedInThisDFS(int id) {return vertexUsedInDFS[id];}
     inline bool isUsedInThisDFS(const Vertex& v) {return isUsedInThisDFS(v.getId());}
@@ -34,8 +40,10 @@ class M_compHyperGraph : public DirectedHyperGraph {
     inline void setUsedInThisDFS(const Vertex& v, bool used) {setUsedInThisDFS(v.getId(), used);}
 
     inline Node<std::shared_ptr<DirectedHyperEdge> > getIncomingHyperedge(int id) {return comeFrom[id];}
-    inline Node<std::shared_ptr<DirectedHyperEdge> > getIncomingHyperedge(const Vertex& v) {return getIncomingHyperedge(v.getId());}
-    inline Node<std::shared_ptr<DirectedHyperEdge> > getIncomingHyperedge(const std::shared_ptr<Vertex> v) {return getIncomingHyperedge(v->getId());}
+    inline Node<std::shared_ptr<DirectedHyperEdge> > getIncomingHyperedge(const Vertex& v)
+        {return getIncomingHyperedge(v.getId());}
+    inline Node<std::shared_ptr<DirectedHyperEdge> > getIncomingHyperedge(const std::shared_ptr<Vertex> v)
+        {return getIncomingHyperedge(v->getId());}
 
     inline void setIncomingHyperedge(int id, Node<std::shared_ptr<DirectedHyperEdge> > from) {comeFrom[id] = from;}
     inline void setIncomingHyperedge(const Vertex& v, Node<std::shared_ptr<DirectedHyperEdge> > from) {
@@ -88,4 +96,3 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
     void print() const;
 };
-#endif  // M_COMP_H_
