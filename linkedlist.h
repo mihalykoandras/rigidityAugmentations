@@ -62,9 +62,7 @@ template<typename T> void List<T>::push_front(T new_data) {
 template<typename T> void List<T>::deleteNode(Node<T>* nodeToDelete) {
     if (nodeToDelete == NULL)
         return;
-    if (nodeToDelete->getData() == first->getData()) {  // delete the first
-        if (nodeToDelete != first)
-            std::cout<<"Problem"<<std::endl;
+    if (nodeToDelete == first) {  // delete the first
         first = nodeToDelete->getNext();
     }
 
@@ -75,5 +73,6 @@ template<typename T> void List<T>::deleteNode(Node<T>* nodeToDelete) {
     if (nodeToDelete->getPrevious() != NULL)
         nodeToDelete->getPrevious()->setNext(nodeToDelete->getNext());
 
+    delete nodeToDelete;
     numbOfData--;
 }

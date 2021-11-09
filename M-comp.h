@@ -27,7 +27,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
  private:
     std::map<int, bool> vertexUsedInDFS;  // key is the id of the vertex
-    std::map<int, Node<std::shared_ptr<DirectedHyperEdge> > > comeFrom;
+    std::map<int, Node<std::shared_ptr<DirectedHyperEdge> >* > comeFrom;
         // contains the list of hyperedges needed to get to this node
     std::map<std::shared_ptr<HyperEdge>, bool> hyperedgeUsedInDFS;
     std::map<std::shared_ptr<HyperEdge>, bool> trivial;
@@ -41,7 +41,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
     inline void setUsedInThisDFS(const std::shared_ptr<Vertex>  v, bool used) {setUsedInThisDFS(v->getId(), used);}
     inline void setUsedInThisDFS(const Vertex& v, bool used) {setUsedInThisDFS(v.getId(), used);}
 
-    inline Node<std::shared_ptr<DirectedHyperEdge> >* getIncomingHyperedge(int id) {return &comeFrom[id];}
+    inline Node<std::shared_ptr<DirectedHyperEdge> >* getIncomingHyperedge(int id) {return comeFrom[id];}
     inline Node<std::shared_ptr<DirectedHyperEdge> >* getIncomingHyperedge(const Vertex& v) {
         return getIncomingHyperedge(v.getId());
     }
@@ -49,14 +49,14 @@ class M_compHyperGraph : public DirectedHyperGraph {
         return getIncomingHyperedge(v->getId());
     }
 
-    inline void setIncomingHyperedge(int id, const Node<std::shared_ptr<DirectedHyperEdge> >& from) {
+    inline void setIncomingHyperedge(int id, Node<std::shared_ptr<DirectedHyperEdge> >* from) {
         comeFrom[id] = from;
     }
-    inline void setIncomingHyperedge(const Vertex& v, const Node<std::shared_ptr<DirectedHyperEdge> >& from) {
+    inline void setIncomingHyperedge(const Vertex& v, Node<std::shared_ptr<DirectedHyperEdge> >* from) {
         setIncomingHyperedge(v.getId(), from);
     }
     inline void setIncomingHyperedge(const std::shared_ptr<Vertex>  v,
-        const Node<std::shared_ptr<DirectedHyperEdge> >& from) {
+        Node<std::shared_ptr<DirectedHyperEdge> >* from) {
         setIncomingHyperedge(v->getId(), from);
     }
 

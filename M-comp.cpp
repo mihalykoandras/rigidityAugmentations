@@ -91,7 +91,7 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
                     for (std::shared_ptr<Vertex> newVert : edgeVertices) {
                         if (!isUsedInThisDFS(newVert)) {
                             setUsedInThisDFS(newVert, true);
-                            setIncomingHyperedge(newVert, *node);
+                            setIncomingHyperedge(newVert, node);
                             Q.push(newVert);
                         }
                     }
