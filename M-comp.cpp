@@ -19,11 +19,11 @@ void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >
     std::shared_ptr<Vertex> from = newEdge->getHead();
     newEdge->setHead(to);
 
-    to->isHeadOf()->push_front(newEdge);
+    headOf(to)->push_front(newEdge);
     to->increaseInDegree();
 
     from->decreaseInDegree();
-    from->isHeadOf()->deleteNode(edge);
+    headOf(from)->deleteNode(edge);
 }
 
 
@@ -81,7 +81,7 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
             } while ( !((*actualVertex == *v1) || (*actualVertex == *v2)) );
             return true;
         } else {
-            Node<std::shared_ptr<DirectedHyperEdge> >* node = actualVertex->isHeadOf()->getFirst();
+            Node<std::shared_ptr<DirectedHyperEdge> >* node = headOf(actualVertex)->getFirst();
             while (node != NULL) {
                 std::shared_ptr<DirectedHyperEdge> dirEdge = node->getData();
                 if (!isUsedInThisDFS(dirEdge->getHyperEdge())) {

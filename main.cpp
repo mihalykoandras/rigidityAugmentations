@@ -48,7 +48,6 @@ int main(int argc, char *argv[]) {
         std::cerr <<"Error code " << e << std::endl;
         return e;
     }
-
     HG.MakeMCompHypergraph(G);
     HG.print();
 

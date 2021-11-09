@@ -41,7 +41,7 @@ void DirectedHyperGraph::addHyperEdge(std::shared_ptr<HyperEdge> edge,  std::sha
     */
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.push_back(std::make_shared<DirectedHyperEdge>(head, undirectedHyperEdges.back()));
-    head->isHeadOf()->push_front(directedHyperEdges.back());
+    headOf(head)->push_front(directedHyperEdges.back());
     head->increaseInDegree();
 }
 
@@ -52,7 +52,7 @@ void DirectedHyperGraph::addDirEdge(std::shared_ptr<Vertex>  head, std::shared_p
     std::vector<std::shared_ptr<Vertex> > vertices = {head, tail};
     undirectedHyperEdges.push_back(std::make_shared<HyperEdge>(vertices));
     directedHyperEdges.push_back(std::make_shared<DirectedHyperEdge>(head, undirectedHyperEdges.back()));
-    head->isHeadOf()->push_front(directedHyperEdges.back());
+    headOf(head)->push_front(directedHyperEdges.back());
     head->increaseInDegree();
 }
 

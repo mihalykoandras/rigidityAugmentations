@@ -34,9 +34,7 @@ template<typename T>class List{
     List() {first = NULL; numbOfData = 0;}
     ~List() {
         Node<T>* next;
-        std::cout<<"H";
         while (first != NULL) {
-            std::cout<<"a-"<<std::endl;
             next = first->getNext();
             delete first;
             first = next;
@@ -51,8 +49,6 @@ template<typename T>class List{
 
 template<typename T> void List<T>::push_front(T new_data) {
     Node<T>* new_node = new Node<T>();
-    std::cout<<"+"<<std::endl;
-
     new_node->setData(new_data);
     new_node->setPrevious(NULL);
     new_node->setNext(first);
@@ -78,7 +74,6 @@ template<typename T> void List<T>::deleteNode(Node<T>* nodeToDelete) {
         nodeToDelete->getPrevious()->setNext(nodeToDelete->getNext());
 
     delete nodeToDelete;
-    std::cout<<"-"<<std::endl;
 
     numbOfData--;
 }
