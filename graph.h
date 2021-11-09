@@ -86,7 +86,16 @@ class Vertex {
             inDegree = 0;
         }
 
-        ~Vertex() {}
+        ~Vertex() {
+            Node<std::shared_ptr<DirectedHyperEdge> >* first = headOfHyperEdge.getFirst();
+            Node<std::shared_ptr<DirectedHyperEdge> >* next;
+            while (first != NULL) {
+                next = first->getNext();
+                first->getData().reset();;
+                first = next;
+            }
+
+        }
 
         inline int getId() const {return id;}
 
