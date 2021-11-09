@@ -13,9 +13,9 @@ void M_compHyperGraph::print() const {
 }
 
 
-void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> > edge
+void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >* edge
 /*comes from the list head->isHeadOf*/, std::shared_ptr<Vertex> to) {
-    std::shared_ptr<DirectedHyperEdge> newEdge = edge.getData();
+    std::shared_ptr<DirectedHyperEdge> newEdge = edge->getData();
     std::shared_ptr<Vertex> from = newEdge->getHead();
     newEdge->setHead(to);
 
@@ -23,7 +23,7 @@ void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >
     to->increaseInDegree();
 
     from->decreaseInDegree();
-    from->isHeadOf()->deleteNode(&edge);
+    from->isHeadOf()->deleteNode(edge);
 }
 
 
@@ -74,8 +74,8 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
             // turn around and return
             std::shared_ptr<Vertex> v = actualVertex;
             do {
-                Node<std::shared_ptr<DirectedHyperEdge> > comeFrom = getIncomingHyperedge(actualVertex);
-                v = comeFrom.getData()->getHead();
+                Node<std::shared_ptr<DirectedHyperEdge> >* comeFrom = getIncomingHyperedge(actualVertex);
+                v = comeFrom->getData()->getHead();
                 changeDirection(comeFrom, actualVertex);
                 actualVertex = v;
             } while ( !((*actualVertex == *v1) || (*actualVertex == *v2)) );

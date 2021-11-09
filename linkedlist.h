@@ -63,6 +63,8 @@ template<typename T> void List<T>::deleteNode(Node<T>* nodeToDelete) {
     if (nodeToDelete == NULL)
         return;
     if (nodeToDelete->getData() == first->getData()) {  // delete the first
+        if (nodeToDelete != first)
+            std::cout<<"Problem"<<std::endl;
         first = nodeToDelete->getNext();
     }
 
