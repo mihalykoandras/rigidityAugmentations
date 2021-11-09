@@ -94,7 +94,7 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vec
 bool RedundHyperGraph::threeInTwo(
     const std::vector<std::shared_ptr<Vertex> >& T1, const std::vector<std::shared_ptr<Vertex> >& T2,
     const std::vector<std::shared_ptr<Vertex> >& T3, const std::vector<std::shared_ptr<Vertex> >& L1,
-    const std::vector<std::shared_ptr<Vertex> >& L2) const {  
+    const std::vector<std::shared_ptr<Vertex> >& L2) const {
         // Running time: O(|V|)
         std::vector<bool> isIn(getNumberOfVertices(), false);
         for (std::shared_ptr<Vertex> v : L1) {
