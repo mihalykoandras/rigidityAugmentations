@@ -1,8 +1,8 @@
 # M-component hypregraph and redundant augmentation
 
 This project is a C++ implementation of some of the most important algorithms regarding the (k,l)-sparsity matroids. Given a graph, we can find a maximal 
-(k,l)-sparse subgraph, the (k,l)-M-component hypergraph, or a minimal edge-set that makes a (k,l)-rigid graph (k,l)-M-connected. All of these algorithms run in 
-O(|V|^2+|E|) time. 
+(k,l)-sparse subgraph, the (k,l)-M-component hypergraph, or a minimal edge-set that makes a (k,l)-tight (hyper)graph (k,l)-redundant. All of these algorithms run in 
+O(|V|^2+|E|) time, which is O(|V|^2) in case of simple graphs. 
 
 ### Theory
 
@@ -12,12 +12,16 @@ and [Globally rigid augmentation of rigid graphs](https://web.cs.elte.hu/egres/t
 ### Usage
 
 The code is tested with C++14. 
+Can be compiled with g++ by 
 
-The driver (main.cpp) accepts two parameters, k and l. For example running 
+>g++ *.cpp -std=c++14 -O3 -o rigidAugmentations
 
->./main 1 1 
+The driver (main.cpp) accepts two parameters, k and l. Default value is (k,l) = (2,3). For example with the previous compile running
 
-the program will work on the (1,1)-sparsity matroid, (i.e. graphical matroid, aka tree). 
+>./rigidAugmentations 1 1 
+
+will work on the (1,1)-sparsity matroid, (i.e. graphical matroid, aka tree).
+
 The program reads the graph in edge-list form from the standard input and writes to the standard input. 
 
 ### Contribution
