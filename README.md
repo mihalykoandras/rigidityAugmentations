@@ -1,8 +1,8 @@
 # M-component hypregraph and redundant augmentation
 
 This project is a C++ implementation of some of the most important algorithms regarding the (k,l)-sparsity matroids. Given a graph, we can find a maximal 
-(k,l)-sparse subgraph, the (k,l)-M-component hypergraph, or a minimal edge-set that makes a (k,l)-tight graph (k,l)-redundant. All of these algorithms run in 
-O(|V|^2+|E|) time. 
+(k,l)-sparse subgraph, the (k,l)-M-component hypergraph, or a minimal edge-set that makes a (k,l)-tight (hyper)graph (k,l)-redundant. All of these algorithms run in 
+O(|V|^2+|E|) time, which is O(|V|^2) in case of simple graphs. 
 
 ### Theory
 
