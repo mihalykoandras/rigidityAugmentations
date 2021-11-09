@@ -163,7 +163,7 @@ class DirectedHyperGraph {
     */
  protected:
         std::map<int, std::shared_ptr<Vertex> > vertices;  // key is the ID of the vertex
-        std::map<std::shared_ptr<Vertex>, List <std::shared_ptr<DirectedHyperEdge> >* > headOfHyperEdge;
+        std::map<std::shared_ptr<Vertex>, std::shared_ptr<List <std::shared_ptr<DirectedHyperEdge> > > >  headOfHyperEdge;
 
         std::list<std::shared_ptr<DirectedHyperEdge> > directedHyperEdges;
         std::list<std::shared_ptr<HyperEdge> > undirectedHyperEdges;
@@ -199,15 +199,12 @@ class DirectedHyperGraph {
             headOfHyperEdge = HG.headOfHyperEdge;
         }
 
-        ~DirectedHyperGraph() {
-            vertices.clear();
-            undirectedHyperEdges.clear();
-        }
+        ~DirectedHyperGraph() {}
 
         void inline insertNewVertex(int id) {  // insert new vertex only if id is not contained
             if (vertices.find(id) == vertices.end()) {
                     vertices[id] = std::make_shared<Vertex>(id);
-                    headOfHyperEdge[vertices[id]] = new List <std::shared_ptr<DirectedHyperEdge> >;
+                    headOfHyperEdge[vertices[id]] = std::make_shared<List <std::shared_ptr<DirectedHyperEdge> > >();
                     // add new List of hyperedges it can be head of, too
                 }
         }
@@ -216,7 +213,7 @@ class DirectedHyperGraph {
         inline size_t getNumberOfEdges() const {return directedHyperEdges.size();}
 
         inline List<std::shared_ptr<DirectedHyperEdge> >* headOf(std::shared_ptr<Vertex> v) {
-            return headOfHyperEdge[v];}
+            return headOfHyperEdge[v].get();}
 
 
         inline std::shared_ptr<Vertex> getVertex(int i) {return vertices[i];}
