@@ -1,5 +1,7 @@
 // Copyright 2021 András Mihálykó MIT License
 
+#include <iostream>
+
 #include "graph.h"
 
 void SimpleGraph::readFromInput() {

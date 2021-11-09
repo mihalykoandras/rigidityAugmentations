@@ -81,13 +81,11 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vec
     }
     std::vector<std::shared_ptr<Vertex> > P = StarSearch(ViL[0], L);
     P.push_back(ViL[0]);
-    if (P.size() < 2) {
-        std::cerr << "Too small transversal" << std::endl;
-    }
+
     return P;
     } else {
-        std::cerr << "G is not rigid" <<std::endl;
-        return  std::vector<std::shared_ptr<Vertex> >();
+        std::cerr << "G is not rigid - can't compute transversal of MCT sets." <<std::endl;
+        throw 32;
     }
 }
 
@@ -121,43 +119,47 @@ bool RedundHyperGraph::threeInTwo(
 
 std::vector<Edge> RedundHyperGraph::toRedund() {
     if (getNumberOfVertices() < 4) {
-        std::cerr << "Too few vertices" << std::endl;
-        return std::vector<Edge>();
+        std::cerr << "Too few vertices in the graph to augment to comute its optimal augmentation." << std::endl;
+        throw 30;
     }
     if (isRigid()) {
-    std::vector<std::shared_ptr<Vertex> > P = findTransversal();
-    if (P.size() < 2) {
-        return std::vector<Edge>();
-    }
-    std::vector<Edge> F;
-    while (P.size() >= 4) {
-        std::shared_ptr<Vertex> i_1 = P[0];
-        std::shared_ptr<Vertex> i_h = P[P.size()-1];
-        std::shared_ptr<Vertex> i_h1 = P[P.size()-2];
-        std::shared_ptr<Vertex> i_h2 = P[P.size()-3];
-        std::vector<std::shared_ptr<Vertex> > T_1_h2 = getT(i_1, i_h2);
-        std::vector<std::shared_ptr<Vertex> > T_1_h1 = getT(i_1, i_h1);
-        std::vector<std::shared_ptr<Vertex> > T_1_h = getT(i_1, i_h);
-        std::vector<std::shared_ptr<Vertex> > T_h_h1 = getT(i_h, i_h1);
-
-        if (threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h2, T_h_h1)) {
-            F.emplace_back(i_h1->getId(), i_h->getId());
-        } else {
-            F.emplace_back(i_h2->getId(), i_h->getId());
-            P[P.size()-3] = P[P.size()-2];
+        std::vector<std::shared_ptr<Vertex> > P = findTransversal();
+        if (P.size() < 2) {
+            std::cerr << "Too small transversal" << std::endl;
+            throw 31;
         }
-        P.pop_back();
-        P.pop_back();
-    }
-    if (P.size() == 2) {
-        F.emplace_back(P[0]->getId(), P[1]->getId());
-    } else {  // == 3
-        F.emplace_back(P[0]->getId(), P[1]->getId());
-        F.emplace_back(P[0]->getId(), P[2]->getId());
-    }
-    return F;
+        if (P.size() < 2) {
+            return std::vector<Edge>();
+        }
+        std::vector<Edge> F;
+        while (P.size() >= 4) {
+            std::shared_ptr<Vertex> i_1 = P[0];
+            std::shared_ptr<Vertex> i_h = P[P.size()-1];
+            std::shared_ptr<Vertex> i_h1 = P[P.size()-2];
+            std::shared_ptr<Vertex> i_h2 = P[P.size()-3];
+            std::vector<std::shared_ptr<Vertex> > T_1_h2 = getT(i_1, i_h2);
+            std::vector<std::shared_ptr<Vertex> > T_1_h1 = getT(i_1, i_h1);
+            std::vector<std::shared_ptr<Vertex> > T_1_h = getT(i_1, i_h);
+            std::vector<std::shared_ptr<Vertex> > T_h_h1 = getT(i_h, i_h1);
+
+            if (threeInTwo(T_1_h2, T_1_h1, T_1_h, T_1_h2, T_h_h1)) {
+                F.emplace_back(i_h1->getId(), i_h->getId());
+            } else {
+                F.emplace_back(i_h2->getId(), i_h->getId());
+                P[P.size()-3] = P[P.size()-2];
+            }
+            P.pop_back();
+            P.pop_back();
+        }
+        if (P.size() == 2) {
+            F.emplace_back(P[0]->getId(), P[1]->getId());
+        } else {  // == 3
+            F.emplace_back(P[0]->getId(), P[1]->getId());
+            F.emplace_back(P[0]->getId(), P[2]->getId());
+        }
+        return F;
     } else {
-        std::cerr << "G is not rigid" <<std::endl;
-        return std::vector<Edge>();
+        std::cerr << "G is not rigid - can't compute optimal augmentation." <<std::endl;
+        throw 32;
     }
 }

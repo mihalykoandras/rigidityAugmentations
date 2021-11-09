@@ -7,7 +7,9 @@
 #include <map>
 #include <memory>
 
+#include "linkedlist.h"
 #include "graph.h"
+
 
 
 class M_compHyperGraph : public DirectedHyperGraph {

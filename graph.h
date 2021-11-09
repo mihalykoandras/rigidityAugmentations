@@ -48,8 +48,8 @@ class SimpleGraph {
                 neighborLists[J[i]].push_back(I[i]);
             }
         } else {
-            // EXCEPTION
-            std::cout << "Two list not the same length" << std::endl;
+            std::cerr << "Two list not the same length" << std::endl;
+            throw 10;
         }
     }
 
@@ -96,9 +96,13 @@ class Vertex {
 
         inline int getInDegree() const {return inDegree;}
         inline void decreaseInDegree() {
-            if (inDegree > 0)
-                inDegree--;  // TODO else exception
+            if (inDegree > 0) {
+                inDegree--;
+            } else {
+                std::cerr << "Degree decreased under 0." << std::endl;
+                throw 11;
             }
+        }
         inline void increaseInDegree() {inDegree++;}
         inline List<std::shared_ptr<DirectedHyperEdge> >* isHeadOf() {return &headOfHyperEdge;}
         inline void print() const {
