@@ -35,17 +35,17 @@ void DirectedHyperEdge::changeUnderlyingEdge(std::shared_ptr<HyperEdge> newHyper
 }
 
 
-void DirectedHyperGraph::addHyperEdge(std::shared_ptr<HyperEdge> edge,  std::shared_ptr<Vertex>  head) {
+void DirectedHyperGraph::addHyperEdge(const std::shared_ptr<HyperEdge>& edge, const std::shared_ptr<Vertex>&  head) {
     /* 
     Ads undirected hyperedge every time if it encounters for every "inMcomp"
     */
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.push_back(std::make_shared<DirectedHyperEdge>(head, undirectedHyperEdges.back()));
     headOf(head)->push_front(directedHyperEdges.back());
-    head->increaseInDegree();
+    increaseInDegree(head);
 }
 
-void DirectedHyperGraph::addDirEdge(std::shared_ptr<Vertex>  head, std::shared_ptr<Vertex>  tail) {
+void DirectedHyperGraph::addDirEdge(const std::shared_ptr<Vertex>&  head, const std::shared_ptr<Vertex>& tail) {
     /* 
     Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
     */
@@ -53,12 +53,12 @@ void DirectedHyperGraph::addDirEdge(std::shared_ptr<Vertex>  head, std::shared_p
     undirectedHyperEdges.push_back(std::make_shared<HyperEdge>(vertices));
     directedHyperEdges.push_back(std::make_shared<DirectedHyperEdge>(head, undirectedHyperEdges.back()));
     headOf(head)->push_front(directedHyperEdges.back());
-    head->increaseInDegree();
+    increaseInDegree(head);
 }
 
-void DirectedHyperGraph::changeDirection(DirectedHyperEdge& edge, std::shared_ptr<Vertex>  to) {
+void DirectedHyperGraph::changeDirection(DirectedHyperEdge& edge, const std::shared_ptr<Vertex>& to) {
     edge.setHead(to);
-    to->increaseInDegree();
+    increaseInDegree(to);
 }
 
 void DirectedHyperGraph::readFromInput() {

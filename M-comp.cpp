@@ -20,9 +20,9 @@ void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >
     newEdge->setHead(to);
 
     headOf(to)->push_front(newEdge);
-    to->increaseInDegree();
+    increaseInDegree(to);
 
-    from->decreaseInDegree();
+    decreaseInDegree(from);
     headOf(from)->deleteNode(edge);
 }
 
@@ -70,7 +70,7 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
         std::shared_ptr<Vertex> actualVertex = Q.front();
         Q.pop();
         if (!(*actualVertex == *v1 || *actualVertex == *v2) &&
-            actualVertex->getInDegree() < k) {  // actual vertex is correct, so
+            getInDegree(actualVertex) < k) {  // actual vertex is correct, so
             // turn around and return
             std::shared_ptr<Vertex> v = actualVertex;
             do {
@@ -110,9 +110,9 @@ std::vector<std::shared_ptr<Vertex> > M_compHyperGraph::getT(std::shared_ptr<Ver
     bool hasEdgeToChange;
     do {
         hasEdgeToChange = DFS(v1, v2);
-    } while ((v1->getInDegree() + v2-> getInDegree() > maxSumDegree) && hasEdgeToChange);
+    } while ((getInDegree(v1) + getInDegree(v2) > maxSumDegree) && hasEdgeToChange);
 
-    if (v1->getInDegree() + v2-> getInDegree() <= maxSumDegree) {
+    if (getInDegree(v1) + getInDegree(v2) <= maxSumDegree) {
         return T;
     } else {
         for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
@@ -151,7 +151,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                         std::make_shared<HyperEdge>(std::vector<std::shared_ptr<Vertex> >({v, neighbor}));
                     setTrivial(newHyperEgde, true);  // this is a new edge, that is trivial
                     SpanningGraph.addEdge(v->getId(), neighbor->getId());
-                    if (v->getInDegree() < neighbor->getInDegree()) {
+                    if (getInDegree(v) < getInDegree(neighbor)) {
                         addHyperEdge(newHyperEgde, v);
                     } else {
                         addHyperEdge(newHyperEgde, neighbor);
