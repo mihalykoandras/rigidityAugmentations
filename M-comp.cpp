@@ -137,10 +137,10 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
             for (int neighborId : neighborIds) {
                 std::shared_ptr<Vertex> neighbor = getVertex(neighborId);
 
-                if (v < neighbor) {  // not to add two times
+            if (v < neighbor) {  // not to add two times
                 // Gprime is jut a check, it could be deleted for faster run
-                    Gprime.addEdge(v->getId(), neighbor->getId());
-                }
+                Gprime.addEdge(v->getId(), neighbor->getId());
+
                 if (inTheSameM_componentWith_i[neighbor->getId()])
                     continue;  // in this case, no action is needed
 
@@ -167,6 +167,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                         }
                     }
                 }
+            }
             }
         }
     }
