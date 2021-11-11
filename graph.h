@@ -244,5 +244,6 @@ class DirectedHyperGraph {
 
         void readFromInput();
         void print() const;
+        void printUndirectedHyperedges() const;
 };
 

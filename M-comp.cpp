@@ -9,7 +9,7 @@
 
 void M_compHyperGraph::print() const {
     std::cout << "(k, ell) = (" << k <<", " << ell << ")" << std::endl;
-    DirectedHyperGraph::print();
+    DirectedHyperGraph::printUndirectedHyperedges();
 }
 
 

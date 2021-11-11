@@ -28,6 +28,17 @@ void DirectedHyperGraph::print() const {
     }
 }
 
+void DirectedHyperGraph::printUndirectedHyperedges() const {
+    std::cout << "Number of vertices: " << getNumberOfVertices() << std::endl;
+    std::cout << "Number of hyperedges: " << getNumberOfEdges() << std::endl;
+    std::cout << "Undirected Hyper Edges:" << std::endl;
+    for (auto const& e : undirectedHyperEdges) {
+        if (e->isStillExistsing())
+            e->print();
+    }
+}
+
+
 void DirectedHyperEdge::changeUnderlyingEdge(std::shared_ptr<HyperEdge> newHyperEdge) {
     hyperEdge->setStillExistsing(false);
     newHyperEdge->setStillExistsing(true);
