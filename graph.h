@@ -5,7 +5,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <memory>
 
 
@@ -31,15 +31,15 @@ class SimpleGraph {
  private:
     int numberOfVertices;
     std::vector<Edge> edgeList;
-    std::map<int, std::vector<int> > neighborLists;
+    std::unordered_map<int, std::vector<int> > neighborLists;
 
  public:
     SimpleGraph() {}
     explicit SimpleGraph(int n) : numberOfVertices(n) {
-        neighborLists = std::map<int, std::vector<int> >();}
+        neighborLists = std::unordered_map<int, std::vector<int> >();}
     SimpleGraph(int n, const std::vector<int>& I, const std::vector<int>& J) {
         numberOfVertices = n;
-        neighborLists = std::map<int, std::vector<int> >();
+        neighborLists = std::unordered_map<int, std::vector<int> >();
 
         if (I.size() == J.size()) {
             for (int i = 0; i < I.size(); i++) {
@@ -153,11 +153,11 @@ class DirectedHyperGraph {
         Funconalities regarding (k,l)-sparsity concern the M_compHyperGraph class
     */
  protected:
-        std::map<int, std::shared_ptr<Vertex> > vertices;  // key is the ID of the vertex
-        std::map<int, std::shared_ptr<List <std::shared_ptr<DirectedHyperEdge> > > >  headOfHyperEdge;
+        std::unordered_map<int, std::shared_ptr<Vertex> > vertices;  // key is the ID of the vertex
+        std::unordered_map<int, std::shared_ptr<List <std::shared_ptr<DirectedHyperEdge> > > >  headOfHyperEdge;
         // key is the vertex ID
 
-        std::map<int, int> inDegree;  // of vertices, key is ID
+        std::unordered_map<int, int> inDegree;  // of vertices, key is ID
 
         std::list<std::shared_ptr<DirectedHyperEdge> > directedHyperEdges;
         std::list<std::shared_ptr<HyperEdge> > undirectedHyperEdges;

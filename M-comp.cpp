@@ -27,11 +27,11 @@ void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >
 }
 
 
-std::map<int, bool> M_compHyperGraph::getSameComponentVector(std::shared_ptr<Vertex> v) {
+std::unordered_map<int, bool> M_compHyperGraph::getSameComponentVector(std::shared_ptr<Vertex> v) {
     /*
         Running time is O(|V|) by Lemma 3.1
     */
-    std::map<int, bool> c_v;
+    std::unordered_map<int, bool> c_v;
     for (std::shared_ptr<HyperEdge> undHyperEdge : undirectedHyperEdges) {
         if (undHyperEdge->isStillExistsing() && !isTrivial(undHyperEdge)) {
             // no need for already deleted or trivial M-components
@@ -131,7 +131,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
         SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
             std::shared_ptr<Vertex> v = getVertex(i);
-            std::map<int, bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
+            std::unordered_map<int, bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
             std::vector<int> neighborIds = G.getNeighbors(v->getId());
 
             for (int neighborId : neighborIds) {

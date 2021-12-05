@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <list>
-#include <map>
+#include <unordered_map>
 #include <memory>
 
 #include "linkedlist.h"
@@ -26,11 +26,11 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
 
  private:
-    std::map<int, bool> vertexUsedInDFS;  // key is the id of the vertex
-    std::map<int, Node<std::shared_ptr<DirectedHyperEdge> >* > comeFrom;
+    std::unordered_map<int, bool> vertexUsedInDFS;  // key is the id of the vertex
+    std::unordered_map<int, Node<std::shared_ptr<DirectedHyperEdge> >* > comeFrom;
         // contains the list of hyperedges needed to get to this node
-    std::map<std::shared_ptr<HyperEdge>, bool> hyperedgeUsedInDFS;
-    std::map<std::shared_ptr<HyperEdge>, bool> trivial;
+    std::unordered_map<std::shared_ptr<HyperEdge>, bool> hyperedgeUsedInDFS;
+    std::unordered_map<std::shared_ptr<HyperEdge>, bool> trivial;
         // if it is underlying hyperedge for a non-trivial M-component or not
 
     inline bool isUsedInThisDFS(int id) {return vertexUsedInDFS[id];}
@@ -66,7 +66,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
     inline bool isTrivial(std::shared_ptr<HyperEdge> edge) {return trivial[edge];}
     inline void setTrivial(std::shared_ptr<HyperEdge> edge, bool used) {trivial[edge] = used;}
 
-    std::map<int, bool> getSameComponentVector(std::shared_ptr<Vertex>  v);
+    std::unordered_map<int, bool> getSameComponentVector(std::shared_ptr<Vertex>  v);
     bool DFS(std::shared_ptr<Vertex>  v1, std::shared_ptr<Vertex>  v2);
 
  public:
