@@ -147,23 +147,23 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                 std::vector<std::shared_ptr<Vertex> > T = getT(v, neighbor);
 
                 if (T.empty()) {  // you can add one edge
-                    std::shared_ptr<HyperEdge> newHyperEgde =
+                    std::shared_ptr<HyperEdge> newHyperEdge =
                         std::make_shared<HyperEdge>(std::vector<std::shared_ptr<Vertex> >({v, neighbor}));
-                    setTrivial(newHyperEgde, true);  // this is a new edge, that is trivial
+                    setTrivial(newHyperEdge, true);  // this is a new edge, that is trivial
                     SpanningGraph.addEdge(v->getId(), neighbor->getId());
                     if (getInDegree(v) < getInDegree(neighbor)) {
-                        addHyperEdge(newHyperEgde, v);
+                        addHyperEdge(newHyperEdge, v);
                     } else {
-                        addHyperEdge(newHyperEgde, neighbor);
+                        addHyperEdge(newHyperEdge, neighbor);
                     }
                     continue;
                 } else {
-                    undirectedHyperEdges.push_back(std::make_shared<HyperEdge>(T));
-                    setTrivial(undirectedHyperEdges.back(), false);  // this is not trivial hyperegde
-                    std::shared_ptr<HyperEdge> newHyperEgde = undirectedHyperEdges.back();
+                    std::shared_ptr<HyperEdge> newHyperEdge = std::make_shared<HyperEdge>(T);
+                    undirectedHyperEdges.push_back(newHyperEdge);
+                    setTrivial(newHyperEdge, false);  // this is not trivial hyperegde
                     for (auto& hyperEdge : directedHyperEdges) {
                         if (isUsedInThisDFS(hyperEdge->getHyperEdge())) {
-                            hyperEdge->changeUnderlyingEdge(newHyperEgde);
+                            hyperEdge->changeUnderlyingEdge(newHyperEdge);
                         }
                     }
                 }

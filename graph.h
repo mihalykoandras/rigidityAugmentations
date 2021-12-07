@@ -238,7 +238,7 @@ class DirectedHyperGraph {
 
         inline std::list<std::shared_ptr<HyperEdge> >* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
 
-        void addHyperEdge(const std::shared_ptr<HyperEdge>& edge, const std::shared_ptr<Vertex>& head);
+        void addHyperEdge(std::shared_ptr<HyperEdge> edge, const std::shared_ptr<Vertex>& head);
         void addDirEdge(const std::shared_ptr<Vertex>& head, const std::shared_ptr<Vertex>& tail);
         void changeDirection(DirectedHyperEdge& edge, const std::shared_ptr<Vertex>& to);
 
