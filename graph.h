@@ -119,7 +119,8 @@ class HyperEdge {
                 std::cout << std::endl;
         }
         inline bool isStillExistsing() const {return stillExistsing;}
-        inline void setStillExistsing(bool exists) {stillExistsing = exists;}
+        inline void deleteHyperedge() {stillExistsing = false; vertices = std::vector<std::shared_ptr<Vertex> >();}
+
 };
 
 class DirectedHyperEdge {
