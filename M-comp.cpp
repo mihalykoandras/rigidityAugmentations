@@ -127,9 +127,27 @@ std::vector<std::shared_ptr<Vertex> > M_compHyperGraph::getT(std::shared_ptr<Ver
 
 
 void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
+    std::cout << "Vertices processed for M-comp hypergraph:" << std::endl;
     if (G.getNumberOfEdges() != 0) {
         SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
+
+            // Progress bar
+            std::cout << "[";
+            int barWidth = 70;
+            float progress = static_cast<float>(i) / G.getNumberOfNodes();
+            int pos = barWidth * progress;
+            for (int i = 0; i < barWidth; ++i) {
+                if (i < pos) std::cout << "=";
+                else if (i == pos) std::cout << ">";
+                else
+                    std::cout << " ";
+            }
+            std::cout << "] " << int(progress * 100.0) << " %\r";
+            std::cout.flush();
+
+            //-------------------------------------
+
             std::shared_ptr<Vertex> v = getVertex(i);
             std::unordered_map<int, bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
             std::vector<int> neighborIds = G.getNeighbors(v->getId());
@@ -161,6 +179,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                     std::shared_ptr<HyperEdge> newHyperEdge = std::make_shared<HyperEdge>(T);
                     undirectedHyperEdges.push_back(newHyperEdge);
                     setTrivial(newHyperEdge, false);  // this is not trivial hyperegde
+                    // std::cout<<"Nontrivial "<< T.size()<<std::endl;
                     for (auto& hyperEdge : directedHyperEdges) {
                         if (isUsedInThisDFS(hyperEdge->getHyperEdge())) {
                             hyperEdge->changeUnderlyingEdge(newHyperEdge);
