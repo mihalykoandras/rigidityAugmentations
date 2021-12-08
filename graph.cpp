@@ -40,8 +40,7 @@ void DirectedHyperGraph::printUndirectedHyperedges() const {
 
 
 void DirectedHyperEdge::changeUnderlyingEdge(std::shared_ptr<HyperEdge> newHyperEdge) {
-    hyperEdge->setStillExistsing(false);
-    newHyperEdge->setStillExistsing(true);
+    hyperEdge->deleteHyperedge();
     hyperEdge = newHyperEdge;
 }
 
