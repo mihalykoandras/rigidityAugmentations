@@ -12,6 +12,15 @@ void M_compHyperGraph::print() const {
     DirectedHyperGraph::printUndirectedHyperedges();
 }
 
+std::shared_ptr<HyperEdge> M_compHyperGraph::makeNewHyperEdge(
+            const std::vector<std::shared_ptr<Vertex> >& vert) {
+    int newID = static_cast<int>(undirectedHyperEdges.size());
+    std::shared_ptr<HyperEdge> newHyperEdge =
+        std::make_shared<HyperEdge>(vert, newID);
+    return newHyperEdge;
+}
+
+
 
 void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >* edge
 /*comes from the list head->isHeadOf*/, std::shared_ptr<Vertex> to) {
@@ -55,8 +64,8 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
     for (std::shared_ptr<HyperEdge> h : undirectedHyperEdges) {  // O(n)
         setUsedInThisDFS(h, false);
     }
-    for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {  // O(n)
-        setUsedInThisDFS(v.second, false);
+    for (auto & v : vertices) {  // O(n)
+        setUsedInThisDFS(v, false);
     }
     std::queue<std::shared_ptr<Vertex> > Q;
 
@@ -115,9 +124,9 @@ std::vector<std::shared_ptr<Vertex> > M_compHyperGraph::getT(std::shared_ptr<Ver
     if (getInDegree(v1) + getInDegree(v2) <= maxSumDegree) {
         return T;
     } else {
-        for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
-            if (isUsedInThisDFS(v.second)) {
-                T.push_back(v.second);
+        for (auto& v : vertices) {
+            if (isUsedInThisDFS(v)) {
+                T.push_back(v);
             }
         }
     }
@@ -166,20 +175,23 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
 
                 if (T.empty()) {  // you can add one edge
                     std::shared_ptr<HyperEdge> newHyperEdge =
-                        std::make_shared<HyperEdge>(std::vector<std::shared_ptr<Vertex> >({v, neighbor}));
-                    setTrivial(newHyperEdge, true);  // this is a new edge, that is trivial
+                        makeNewHyperEdge(std::vector<std::shared_ptr<Vertex> >({v, neighbor}));
+                        // this is a new edge, that is trivial
                     SpanningGraph.addEdge(v->getId(), neighbor->getId());
                     if (getInDegree(v) < getInDegree(neighbor)) {
                         addHyperEdge(newHyperEdge, v);
                     } else {
                         addHyperEdge(newHyperEdge, neighbor);
                     }
+                    trivial.push_back(true);
+                    hyperedgeUsedInDFS.push_back(false);
                     continue;
                 } else {
-                    std::shared_ptr<HyperEdge> newHyperEdge = std::make_shared<HyperEdge>(T);
+                    std::shared_ptr<HyperEdge> newHyperEdge = makeNewHyperEdge(T);
                     undirectedHyperEdges.push_back(newHyperEdge);
-                    setTrivial(newHyperEdge, false);  // this is not trivial hyperegde
-                    // std::cout<<"Nontrivial "<< T.size()<<std::endl;
+                    trivial.push_back(false);
+                    hyperedgeUsedInDFS.push_back(false);
+                    //non-trivial new edge
                     for (auto& hyperEdge : directedHyperEdges) {
                         if (isUsedInThisDFS(hyperEdge->getHyperEdge())) {
                             hyperEdge->changeUnderlyingEdge(newHyperEdge);

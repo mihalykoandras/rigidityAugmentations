@@ -60,7 +60,7 @@ void DirectedHyperGraph::addDirEdge(const std::shared_ptr<Vertex>&  head, const 
     Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
     */
     std::vector<std::shared_ptr<Vertex> > vertices = {head, tail};
-    std::shared_ptr<HyperEdge> edge = std::make_shared<HyperEdge>(vertices);
+    std::shared_ptr<HyperEdge> edge = std::make_shared<HyperEdge>(vertices, (int)undirectedHyperEdges.size());
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.push_back(std::make_shared<DirectedHyperEdge>(head, edge));
     headOf(head)->push_front(directedHyperEdges.back());
@@ -90,7 +90,7 @@ void DirectedHyperGraph::readFromInput() {
                 h = v;
             std::cin >> v;
         }
-        std::shared_ptr<HyperEdge> newHyperEgde = std::make_shared<HyperEdge>(edgeVertices);
+        std::shared_ptr<HyperEdge> newHyperEgde = std::make_shared<HyperEdge>(edgeVertices, (int)undirectedHyperEdges.size());
         addHyperEdge(newHyperEgde, vertices[h]);
     }
 }

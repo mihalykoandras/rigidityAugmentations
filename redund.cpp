@@ -22,9 +22,9 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::StarSearch(
     std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L = std::vector<std::shared_ptr<Vertex> >()) {
     // Running time: O(|V|^2)
 
-    for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
-        setMark(v.second, false);
-        setUsedForStar(v.second, false);
+    for (std::shared_ptr<Vertex>  & v : vertices) {
+        setMark(v, false);
+        setUsedForStar(v, false);
     }
 
     setMark(i, true);
@@ -34,15 +34,15 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::StarSearch(
         }
     }
 
-    for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
-        if (!isMarked(v.second)) {
-            markOneTight(i, v.second);
+    for (std::shared_ptr<Vertex> & v : vertices) {
+        if (!isMarked(v)) {
+            markOneTight(i, v);
         }
     }
     std::vector<std::shared_ptr<Vertex> > P(0);
-    for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
-        if (isUsedForStar(v.second)) {
-            P.push_back(v.second);
+    for (std::shared_ptr<Vertex> & v : vertices) {
+        if (isUsedForStar(v)) {
+            P.push_back(v);
         }
     }
     return P;
@@ -70,12 +70,12 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vec
         return ViL;
     }
     if (ViL.size() == 2) {
-        for (std::pair<const int, std::shared_ptr<Vertex> > & v : vertices) {
-            if (isWholeSized(getT(ViL[0], v.second))) {
-                return std::vector<std::shared_ptr<Vertex> >{ViL[0], v.second};
+        for (std::shared_ptr<Vertex> & v : vertices) {
+            if (isWholeSized(getT(ViL[0], v))) {
+                return std::vector<std::shared_ptr<Vertex> >{ViL[0], v};
             }
-            if (isWholeSized(getT(ViL[1], v.second))) {
-                return std::vector<std::shared_ptr<Vertex> >{ViL[1], v.second};
+            if (isWholeSized(getT(ViL[1], v))) {
+                return std::vector<std::shared_ptr<Vertex> >{ViL[1], v};
             }
         }
     }

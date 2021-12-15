@@ -26,20 +26,22 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
 
  private:
-    std::unordered_map<int, bool> vertexUsedInDFS;  // key is the id of the vertex
-    std::unordered_map<int, Node<std::shared_ptr<DirectedHyperEdge> >* > comeFrom;
+    std::vector<bool> vertexUsedInDFS;  // key is the id of the vertex
+    std::vector<Node<std::shared_ptr<DirectedHyperEdge> >* > comeFrom;
         // contains the list of hyperedges needed to get to this node
-    std::unordered_map<std::shared_ptr<HyperEdge>, bool> hyperedgeUsedInDFS;
-    std::unordered_map<std::shared_ptr<HyperEdge>, bool> trivial;
+    std::vector<bool> hyperedgeUsedInDFS;
+    std::vector<bool> trivial;
         // if it is underlying hyperedge for a non-trivial M-component or not
 
-    inline bool isUsedInThisDFS(int id) {return vertexUsedInDFS[id];}
-    inline bool isUsedInThisDFS(const Vertex& v) {return isUsedInThisDFS(v.getId());}
-    inline bool isUsedInThisDFS(const std::shared_ptr<Vertex> v) {return isUsedInThisDFS(v->getId());}
+    inline bool isVertexUsedInThisDFS(int id) {return vertexUsedInDFS[id];}
+    inline bool isUsedInThisDFS(const Vertex& v) {return isVertexUsedInThisDFS(v.getId());}
+    inline bool isUsedInThisDFS(const std::shared_ptr<Vertex> v) {return isVertexUsedInThisDFS(v->getId());}
 
-    inline void setUsedInThisDFS(int id, bool used) {vertexUsedInDFS[id] = used;}
-    inline void setUsedInThisDFS(const std::shared_ptr<Vertex>  v, bool used) {setUsedInThisDFS(v->getId(), used);}
-    inline void setUsedInThisDFS(const Vertex& v, bool used) {setUsedInThisDFS(v.getId(), used);}
+    inline void setVertexUsedInThisDFS(int id, bool used) {vertexUsedInDFS[id] = used;}
+    inline void setUsedInThisDFS(const std::shared_ptr<Vertex>  v, bool used) {
+        setVertexUsedInThisDFS(v->getId(), used);
+    }
+    inline void setUsedInThisDFS(const Vertex& v, bool used) {setVertexUsedInThisDFS(v.getId(), used);}
 
     inline Node<std::shared_ptr<DirectedHyperEdge> >* getIncomingHyperedge(int id) {return comeFrom[id];}
     inline Node<std::shared_ptr<DirectedHyperEdge> >* getIncomingHyperedge(const Vertex& v) {
@@ -60,11 +62,15 @@ class M_compHyperGraph : public DirectedHyperGraph {
         setIncomingHyperedge(v->getId(), from);
     }
 
-    inline bool isUsedInThisDFS(std::shared_ptr<HyperEdge> edge) {return hyperedgeUsedInDFS[edge];}
-    inline void setUsedInThisDFS(std::shared_ptr<HyperEdge> edge, bool used) {hyperedgeUsedInDFS[edge] = used;}
+    inline bool isHyperEdgeUsedInThisDFS(int id) {return hyperedgeUsedInDFS[id];}
+    inline bool isUsedInThisDFS(std::shared_ptr<HyperEdge> edge) {return isHyperEdgeUsedInThisDFS(edge->getId());}
+    inline void setHyperEdgeUsedInThisDFS(int id, bool used) {hyperedgeUsedInDFS[id] = used;}
+    inline void setUsedInThisDFS(std::shared_ptr<HyperEdge> edge, bool used) {setHyperEdgeUsedInThisDFS(edge->getId(), used);}
 
-    inline bool isTrivial(std::shared_ptr<HyperEdge> edge) {return trivial[edge];}
-    inline void setTrivial(std::shared_ptr<HyperEdge> edge, bool used) {trivial[edge] = used;}
+    inline bool isTrivial(int id) {return trivial[id];}
+    inline bool isTrivial(std::shared_ptr<HyperEdge> edge) {return isTrivial(edge->getId());}
+    inline void setTrivial(int id, bool used) {trivial[id] = used;}
+    inline void setTrivial(std::shared_ptr<HyperEdge> edge, bool used) {setTrivial(edge->getId(), used);}
 
     std::unordered_map<int, bool> getSameComponentVector(std::shared_ptr<Vertex>  v);
     bool DFS(std::shared_ptr<Vertex>  v1, std::shared_ptr<Vertex>  v2);
@@ -86,6 +92,8 @@ class M_compHyperGraph : public DirectedHyperGraph {
         for (size_t i = 0; i < size; i++) {
             insertNewVertex(i);
         }
+        comeFrom = std::vector<Node<std::shared_ptr<DirectedHyperEdge> >* >(n);
+        vertexUsedInDFS = std::vector<bool>(n, false);
     }
 
     M_compHyperGraph(const M_compHyperGraph& HG) : DirectedHyperGraph(HG) {
@@ -99,6 +107,8 @@ class M_compHyperGraph : public DirectedHyperGraph {
     }
 
     ~M_compHyperGraph() {}
+
+    std::shared_ptr<HyperEdge> makeNewHyperEdge(const std::vector<std::shared_ptr<Vertex> >& v_);
 
     void changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >* edge, std::shared_ptr<Vertex>  to);
 

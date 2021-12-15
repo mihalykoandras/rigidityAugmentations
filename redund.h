@@ -3,7 +3,6 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
 #include <memory>
 
 
@@ -17,8 +16,8 @@ class RedundHyperGraph : public M_compHyperGraph {
     even an optimal redund augmenting edge set.  
 */
  private:
-    std::unordered_map<int, bool> marked;
-    std::unordered_map<int, bool> usedForStar;
+    std::vector<bool> marked;
+    std::vector<bool> usedForStar;
 
     std::shared_ptr<Vertex> findLowDegreeVertex();
     void markOneTight(std::shared_ptr<Vertex> head, std::shared_ptr<Vertex> j);
@@ -55,8 +54,8 @@ class RedundHyperGraph : public M_compHyperGraph {
     }
 
     explicit RedundHyperGraph(const M_compHyperGraph& HG) : M_compHyperGraph(HG) {
-        marked = std::unordered_map<int, bool>();
-        usedForStar = std::unordered_map<int, bool>();
+        marked = std::vector<bool>(HG.getNumberOfVertices(), false);
+        usedForStar = std::vector<bool>(HG.getNumberOfVertices(), false);
     }
 
 

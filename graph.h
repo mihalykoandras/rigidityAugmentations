@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <map>
 #include <unordered_map>
 #include <memory>
 
@@ -77,23 +78,26 @@ class Vertex {
     Uniquely identified by integer ID.
     */
  private:
-        int id;
-        int inDegree;
+        int name;  // id from outside
+        int id;  // position in the vectors
 
  public:
         Vertex() {}
-        explicit Vertex(int id_):id(id_) {}
+        explicit Vertex(int id_):name(id_), id(id_) {}
+        Vertex(int name_, int id_):name(name_), id(id_) {}
 
         ~Vertex() {}
 
         inline int getId() const {return id;}
+        inline int getName() const {return name;}
+
 
         inline bool operator==(const Vertex &v) const {return id == v.getId();}
         inline bool operator<(const Vertex &v) const {return id < v.getId();}
         inline bool operator>(const Vertex &v) const {return id > v.getId();}
 
         inline void print() const {
-                std::cout << id;
+                std::cout << name;
         }
 };
 
@@ -101,14 +105,20 @@ class HyperEdge {
  protected:
         std::vector<std::shared_ptr<Vertex> > vertices;
         bool stillExistsing;
+        int id;  // id for identification in the vectors
         // we don't need to delete the hyperedges "physically"
         // just note that they are not useful any more
-        // We may clean them up, if needed.
+        // and we clean up the vectors for freeing up space
+
 
  public:
-        explicit HyperEdge(const std::vector<std::shared_ptr<Vertex> >& v_) : vertices(v_) { stillExistsing = true;}
+        HyperEdge(const std::vector<std::shared_ptr<Vertex> >& v_, int id_) :
+                vertices(v_), id(id_) {stillExistsing = true;}
 
         ~HyperEdge() {}
+
+        int getId() const {return id;}
+
 
         inline std::vector<std::shared_ptr<Vertex> > getVertices() const {return vertices;}
         inline void print() const {
@@ -119,8 +129,10 @@ class HyperEdge {
                 std::cout << std::endl;
         }
         inline bool isStillExistsing() const {return stillExistsing;}
-        inline void deleteHyperedge() {stillExistsing = false; vertices = std::vector<std::shared_ptr<Vertex> >();}
-
+        inline void deleteHyperedge() {
+            stillExistsing = false; 
+            vertices = std::vector<std::shared_ptr<Vertex> >();
+        }
 };
 
 class DirectedHyperEdge {
@@ -154,14 +166,15 @@ class DirectedHyperGraph {
         Funconalities regarding (k,l)-sparsity concern the M_compHyperGraph class
     */
  protected:
-        std::unordered_map<int, std::shared_ptr<Vertex> > vertices;  // key is the ID of the vertex
-        std::unordered_map<int, std::shared_ptr<List <std::shared_ptr<DirectedHyperEdge> > > >  headOfHyperEdge;
-        // key is the vertex ID
+        std::vector<std::shared_ptr<Vertex> > vertices;  // indexed by the ID of the vertex
+        std::map<int, int> vertexNameToID;
+        std::vector<std::shared_ptr<List <std::shared_ptr<DirectedHyperEdge> > > > headOfHyperEdge;
+        // indexed by the ID of the vertex
 
-        std::unordered_map<int, int> inDegree;  // of vertices, key is ID
+        std::vector<int> inDegree;  // indexed by the ID of the vertex
 
         std::list<std::shared_ptr<DirectedHyperEdge> > directedHyperEdges;
-        std::list<std::shared_ptr<HyperEdge> > undirectedHyperEdges;
+        std::vector<std::shared_ptr<HyperEdge> > undirectedHyperEdges;
         size_t size;
 
         inline List<std::shared_ptr<DirectedHyperEdge> >* headOf(int id) {
@@ -220,14 +233,15 @@ class DirectedHyperGraph {
 
         ~DirectedHyperGraph() {}
 
-        void inline insertNewVertex(int id) {  // insert new vertex only if id is not contained
-            if (vertices.find(id) == vertices.end()) {
-                    vertices[id] = std::make_shared<Vertex>(id);
-                    headOfHyperEdge[id] = std::make_shared<List <std::shared_ptr<DirectedHyperEdge> > >();
-                    // add new List of hyperedges it can be head of, too
-
-                    inDegree[id] = 0;
-                }
+        void inline insertNewVertex(int name) {  // insert new vertex only if id is not contained
+            int id = static_cast<int>(vertices.size());
+            if (vertexNameToID.find(name) == vertexNameToID.end()) {
+                vertexNameToID[name] = id;
+                vertices.push_back(std::make_shared<Vertex>(name, id));
+                headOfHyperEdge.push_back(std::make_shared<List <std::shared_ptr<DirectedHyperEdge> > >());
+                // add new List of hyperedges it can be head of, too
+                inDegree.push_back(0);
+            }
         }
 
         inline size_t getNumberOfVertices() const {return size;}
@@ -237,7 +251,7 @@ class DirectedHyperGraph {
         inline int getInDegree(int id) {return inDegree[id];}
         inline int getInDegree(const std::shared_ptr<Vertex>& v) {return inDegree[v->getId()];}
 
-        inline std::list<std::shared_ptr<HyperEdge> >* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
+        inline std::vector<std::shared_ptr<HyperEdge> >* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
 
         void addHyperEdge(std::shared_ptr<HyperEdge> edge, const std::shared_ptr<Vertex>& head);
         void addDirEdge(const std::shared_ptr<Vertex>& head, const std::shared_ptr<Vertex>& tail);
