@@ -6,7 +6,6 @@
 #include <list>
 #include <iostream>
 #include <map>
-#include <unordered_map>
 #include <memory>
 
 
@@ -32,15 +31,15 @@ class SimpleGraph {
  private:
     int numberOfVertices;
     std::vector<Edge> edgeList;
-    std::unordered_map<int, std::vector<int> > neighborLists;
+    std::map<int, std::vector<int> > neighborLists;
 
  public:
     SimpleGraph() {}
     explicit SimpleGraph(int n) : numberOfVertices(n) {
-        neighborLists = std::unordered_map<int, std::vector<int> >();}
+        neighborLists = std::map<int, std::vector<int> >();}
     SimpleGraph(int n, const std::vector<int>& I, const std::vector<int>& J) {
         numberOfVertices = n;
-        neighborLists = std::unordered_map<int, std::vector<int> >();
+        neighborLists = std::map<int, std::vector<int> >();
 
         if (I.size() == J.size()) {
             for (int i = 0; i < I.size(); i++) {

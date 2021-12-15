@@ -4,7 +4,6 @@
 
 #include <vector>
 #include <list>
-#include <unordered_map>
 #include <memory>
 
 #include "linkedlist.h"
@@ -72,7 +71,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
     inline void setTrivial(int id, bool used) {trivial[id] = used;}
     inline void setTrivial(std::shared_ptr<HyperEdge> edge, bool used) {setTrivial(edge->getId(), used);}
 
-    std::unordered_map<int, bool> getSameComponentVector(std::shared_ptr<Vertex>  v);
+    std::vector<bool> getSameComponentVector(std::shared_ptr<Vertex>  v);
     bool DFS(std::shared_ptr<Vertex>  v1, std::shared_ptr<Vertex>  v2);
 
  public:

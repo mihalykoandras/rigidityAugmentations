@@ -36,11 +36,11 @@ void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >
 }
 
 
-std::unordered_map<int, bool> M_compHyperGraph::getSameComponentVector(std::shared_ptr<Vertex> v) {
+std::vector<bool> M_compHyperGraph::getSameComponentVector(std::shared_ptr<Vertex> v) {
     /*
-        Running time is O(|V|) by Lemma 3.1
+        Running time is O(|V|) by Lemma 3.2
     */
-    std::unordered_map<int, bool> c_v;
+    std::vector<bool> c_v(getNumberOfVertices(), false);
     for (std::shared_ptr<HyperEdge> undHyperEdge : undirectedHyperEdges) {
         if (undHyperEdge->isStillExistsing() && !isTrivial(undHyperEdge)) {
             // no need for already deleted or trivial M-components
@@ -48,6 +48,7 @@ std::unordered_map<int, bool> M_compHyperGraph::getSameComponentVector(std::shar
             for (std::shared_ptr<Vertex> vertex : undHyperEdge->getVertices()) {
                 if (*vertex == *v) {
                     isVIn = true;
+                    break;
                 }
             }
             if (isVIn) {
@@ -158,7 +159,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
             //-------------------------------------
 
             std::shared_ptr<Vertex> v = getVertex(i);
-            std::unordered_map<int, bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
+            std::vector<bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
             std::vector<int> neighborIds = G.getNeighbors(v->getId());
 
             for (int neighborId : neighborIds) {
