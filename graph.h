@@ -114,10 +114,7 @@ class HyperEdge {
         HyperEdge(const std::vector<std::shared_ptr<Vertex> >& v_, int id_) :
                 vertices(v_), id(id_) {stillExistsing = true;}
 
-        ~HyperEdge() {
-            stillExistsing = false;
-            vertices = std::vector<std::shared_ptr<Vertex> >();
-        }
+        ~HyperEdge() {}
 
         int getId() const {return id;}
 
