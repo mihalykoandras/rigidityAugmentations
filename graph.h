@@ -114,7 +114,10 @@ class HyperEdge {
         HyperEdge(const std::vector<std::shared_ptr<Vertex> >& v_, int id_) :
                 vertices(v_), id(id_) {stillExistsing = true;}
 
-        ~HyperEdge() {}
+        ~HyperEdge() {
+            stillExistsing = false;
+            vertices = std::vector<std::shared_ptr<Vertex> >();
+        }
 
         int getId() const {return id;}
 
@@ -129,7 +132,7 @@ class HyperEdge {
         }
         inline bool isStillExistsing() const {return stillExistsing;}
         inline void deleteHyperedge() {
-            stillExistsing = false; 
+            stillExistsing = false;
             vertices = std::vector<std::shared_ptr<Vertex> >();
         }
 };

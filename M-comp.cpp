@@ -61,20 +61,15 @@ std::vector<bool> M_compHyperGraph::getSameComponentVector(std::shared_ptr<Verte
     return c_v;
 }
 
-bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2) {
-    for (std::shared_ptr<HyperEdge> h : undirectedHyperEdges) {  // O(n)
-        setUsedInThisDFS(h, false);
-    }
-    for (auto & v : vertices) {  // O(n)
-        setUsedInThisDFS(v, false);
-    }
+bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2,
+            std::vector<bool>& vertexUsedInDFS, std::vector<bool>& hyperEdgeUsedInDFS) {
     std::queue<std::shared_ptr<Vertex> > Q;
 
     Q.push(v1);
-    setUsedInThisDFS(v1, true);
+    vertexUsedInDFS[v1->getId()] = true;
 
     Q.push(v2);
-    setUsedInThisDFS(v2, true);
+    vertexUsedInDFS[v2->getId()] = true;
 
     while (!Q.empty()) {
         std::shared_ptr<Vertex> actualVertex = Q.front();
@@ -94,13 +89,13 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
             Node<std::shared_ptr<DirectedHyperEdge> >* node = headOf(actualVertex)->getFirst();
             while (node != NULL) {
                 std::shared_ptr<DirectedHyperEdge> dirEdge = node->getData();
-                if (!isUsedInThisDFS(dirEdge->getHyperEdge())) {
+                if (!hyperEdgeUsedInDFS[dirEdge->getHyperEdge()->getId()]) {
                      // This can be used for transverse back
-                    setUsedInThisDFS(dirEdge->getHyperEdge(), true);
+                    hyperEdgeUsedInDFS[dirEdge->getHyperEdge()->getId()] = true;
                     std::vector<std::shared_ptr<Vertex> > edgeVertices = dirEdge->getHyperEdge()->getVertices();
                     for (std::shared_ptr<Vertex> newVert : edgeVertices) {
-                        if (!isUsedInThisDFS(newVert)) {
-                            setUsedInThisDFS(newVert, true);
+                        if (!vertexUsedInDFS[newVert->getId()]) {
+                            vertexUsedInDFS[newVert->getId()] = true;
                             setIncomingHyperedge(newVert, node);
                             Q.push(newVert);
                         }
@@ -113,27 +108,31 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
     return false;
 }
 
-std::vector<std::shared_ptr<Vertex> > M_compHyperGraph::getT(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2) {
+
+std::vector<std::shared_ptr<Vertex> > M_compHyperGraph::getTHyperEdges(
+        std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2, std::vector<bool>& hyperedgeUsedInDFS) {
     std::vector<std::shared_ptr<Vertex> > T(0);
     int maxSumDegree = 2 * k - ell - 1;
 
+    std::vector<bool> vertexUsedInDFS;
     bool hasEdgeToChange;
     do {
-        hasEdgeToChange = DFS(v1, v2);
+        vertexUsedInDFS = std::vector<bool>(getNumberOfVertices(), false);
+        hyperedgeUsedInDFS = std::vector<bool>(undirectedHyperEdges.size(), false);  // O(n)
+        hasEdgeToChange = DFS(v1, v2, vertexUsedInDFS, hyperedgeUsedInDFS);
     } while ((getInDegree(v1) + getInDegree(v2) > maxSumDegree) && hasEdgeToChange);
 
     if (getInDegree(v1) + getInDegree(v2) <= maxSumDegree) {
         return T;
     } else {
         for (auto& v : vertices) {
-            if (isUsedInThisDFS(v)) {
+            if (vertexUsedInDFS[v->getId()]) {
                 T.push_back(v);
             }
         }
     }
     return T;
 }
-
 
 
 void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
@@ -172,7 +171,8 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                 if (inTheSameM_componentWith_i[neighbor->getId()])
                     continue;  // in this case, no action is needed
 
-                std::vector<std::shared_ptr<Vertex> > T = getT(v, neighbor);
+                std::vector<bool> usedHyperEdge;
+                std::vector<std::shared_ptr<Vertex> > T = getTHyperEdges(v, neighbor, usedHyperEdge);
 
                 if (T.empty()) {  // you can add one edge
                     std::shared_ptr<HyperEdge> newHyperEdge =
@@ -185,17 +185,15 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                         addHyperEdge(newHyperEdge, neighbor);
                     }
                     trivial.push_back(true);
-                    hyperedgeUsedInDFS.push_back(false);
                     continue;
                 } else {
                     std::shared_ptr<HyperEdge> newHyperEdge = makeNewHyperEdge(T);
                     undirectedHyperEdges.push_back(newHyperEdge);
                     trivial.push_back(false);
-                    hyperedgeUsedInDFS.push_back(false);
-                    //non-trivial new edge
-                    for (auto& hyperEdge : directedHyperEdges) {
-                        if (isUsedInThisDFS(hyperEdge->getHyperEdge())) {
-                            hyperEdge->changeUnderlyingEdge(newHyperEdge);
+                    // non-trivial new edge
+                    for (auto& dirHyperEdge : directedHyperEdges) {
+                        if (usedHyperEdge[dirHyperEdge->getHyperEdge()->getId()]) {
+                            dirHyperEdge->changeUnderlyingEdge(newHyperEdge);
                         }
                     }
                 }
