@@ -117,7 +117,7 @@ class HyperEdge {
         ~HyperEdge() {}
 
         int getId() const {return id;}
-
+        void setId(int id_) {id = id_;}  // for rearrange purpose
 
         inline std::vector<std::shared_ptr<Vertex> > getVertices() const {return vertices;}
         inline void print() const {

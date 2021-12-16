@@ -49,7 +49,8 @@ int main(int argc, char *argv[]) {
         return e;
     }
     HG.MakeMCompHypergraph(G);
-    HG.print();
+    std::cout << " " << std::endl;
+    //HG.print();
 
     RedundHyperGraph R(HG);
 

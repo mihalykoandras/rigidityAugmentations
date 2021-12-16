@@ -139,6 +139,8 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
     std::cout << "Vertices processed for M-comp hypergraph:" << std::endl;
     if (G.getNumberOfEdges() != 0) {
         SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
+        int deletedHyperEdgeNumber = 0;
+        double rearrangeRatio = 0.1;  // if more than this is non-existing edges, we delet those
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
 
             // Progress bar
@@ -152,10 +154,27 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                 else
                     std::cout << " ";
             }
-            std::cout << "] " << int(progress * 100.0) << " %\r";
+            std::cout << "] " << int((progress + 0.003) * 100.0) << " %\r";
             std::cout.flush();
 
             //-------------------------------------
+            // rearrange undirected hyperedges
+
+            if (deletedHyperEdgeNumber > undirectedHyperEdges.size() * rearrangeRatio) {
+                    std::vector<std::shared_ptr<HyperEdge> > newUndirected;
+                    std::vector<bool> newTrivial;
+
+                for (auto& hyperedge : undirectedHyperEdges) {
+                    if (hyperedge->isStillExistsing()) {
+                        newTrivial.push_back(isTrivial(hyperedge));
+                        newUndirected.push_back(hyperedge);
+                        newUndirected.back()->setId(newUndirected.size()-1);
+                    }
+                }
+                trivial = newTrivial;
+                undirectedHyperEdges = newUndirected;
+                deletedHyperEdgeNumber = 0;
+            }
 
             std::shared_ptr<Vertex> v = getVertex(i);
             std::vector<bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
@@ -193,6 +212,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                     // non-trivial new edge
                     for (auto& dirHyperEdge : directedHyperEdges) {
                         if (usedHyperEdge[dirHyperEdge->getHyperEdge()->getId()]) {
+                            deletedHyperEdgeNumber++;
                             dirHyperEdge->changeUnderlyingEdge(newHyperEdge);
                         }
                     }
