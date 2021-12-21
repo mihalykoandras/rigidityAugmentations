@@ -19,7 +19,7 @@ class RedundHyperGraph : public M_compHyperGraph {
     std::vector<bool> marked;
     std::vector<bool> usedForStar;
 
-    std::shared_ptr<Vertex> findLowDegreeVertex();
+    std::shared_ptr<Vertex> findMinDegreeVertex();
     void markOneTight(std::shared_ptr<Vertex> head, std::shared_ptr<Vertex> j);
     bool isWholeSized(const std::vector<std::shared_ptr<Vertex> >& V) const {return V.size() == size;}
     std::vector<std::shared_ptr<Vertex> > StarSearch(

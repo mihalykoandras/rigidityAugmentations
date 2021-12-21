@@ -140,7 +140,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
     if (G.getNumberOfEdges() != 0) {
         SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
         int deletedHyperEdgeNumber = 0;
-        double rearrangeRatio = 0.1;  // if more than this is non-existing edges, we delet those
+        double rearrangeRatio = 10;  // if more than this is non-existing edges, we delet those
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
 
             // Progress bar

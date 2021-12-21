@@ -48,22 +48,26 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::StarSearch(
     return P;
 }
 
-std::shared_ptr<Vertex> RedundHyperGraph::findLowDegreeVertex() {
+std::shared_ptr<Vertex> RedundHyperGraph::findMinDegreeVertex() {
     std::vector<int> degree(getNumberOfVertices(), 0);
     for (auto& edge : SpanningGraph.getEdges()) {
         degree[edge.getEdge()[0]]++;
         degree[edge.getEdge()[1]]++;
     }
 
-    int i = 0;
-    while (degree[i] >= 2 * k) {i++;}
-    return getVertex(i);
+    int bestDegree = 0;
+    for (int i = 1; i <vertices.size(); i++) {
+        if (degree[i] < degree[bestDegree]) {
+            bestDegree = i;
+        }
+    }
+    return getVertex(bestDegree);
 }
 
 
 std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vector<std::shared_ptr<Vertex> > L) {
     if (isRigid()) {
-    std::shared_ptr<Vertex> i = findLowDegreeVertex();
+    std::shared_ptr<Vertex> i = findMinDegreeVertex();
     std::vector<std::shared_ptr<Vertex> > ViL = StarSearch(i, L);
     if (ViL.size() == 1) {
         ViL.push_back(i);
