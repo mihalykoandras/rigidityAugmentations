@@ -86,6 +86,29 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vec
     std::vector<std::shared_ptr<Vertex> > P = StarSearch(ViL[0], L);
     P.push_back(ViL[0]);
 
+    // The code separates here if l <= 3/2 k, then it is enough.
+    // Else we need to check every neighbor of i for potential smaller star, too.
+
+    if (ell > 3 * k / 2) {
+        for (auto& edge : SpanningGraph.getEdges()) {
+            std::vector<int> indices = edge.getEdge();
+            if (indices[0] == i->getId() || indices[1] == i->getId()) {  // indexed with id
+                int nidx = indices[0] + indices[1] - i->getId();  // i's neighbor
+                std::shared_ptr<Vertex> ni = getVertex(nidx);
+                if (getT(i, ni).size() == 2) {
+                    std::vector<std::shared_ptr<Vertex> > P_potential = StarSearch(ni, L);
+                    P_potential.push_back(ni);
+                    if (P_potential.size() < P.size()) {
+                        P = P_potential;
+                        break;  // can be just one
+                    }
+                }
+            }
+        }
+    }
+
+
+
     return P;
     } else {
         std::cerr << "G is not rigid - can't compute transversal of MCT sets." <<std::endl;
@@ -132,9 +155,7 @@ std::vector<Edge> RedundHyperGraph::toRedund() {
             std::cerr << "Too small transversal" << std::endl;
             throw 31;
         }
-        if (P.size() < 2) {
-            return std::vector<Edge>();
-        }
+
         std::vector<Edge> F;
         while (P.size() >= 4) {
             std::shared_ptr<Vertex> i_1 = P[0];
