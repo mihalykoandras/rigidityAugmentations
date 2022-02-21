@@ -38,7 +38,7 @@ void M_compHyperGraph::changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >
 
 std::vector<bool> M_compHyperGraph::getSameComponentVector(std::shared_ptr<Vertex> v) {
     /*
-        Running time is O(|V|) by Lemma 3.2
+        Running time is O(|V|) by Dissertation, Lemma 8.2
     */
     std::vector<bool> c_v(getNumberOfVertices(), false);
     for (std::shared_ptr<HyperEdge> undHyperEdge : undirectedHyperEdges) {
@@ -177,7 +177,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
             }
 
             std::shared_ptr<Vertex> v = getVertex(i);
-            std::vector<bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the paper
+            std::vector<bool> inTheSameM_componentWith_i = getSameComponentVector(v);  // c_i in the dissertation
             std::vector<int> neighborIds = G.getNeighbors(v->getId());
 
             for (int neighborId : neighborIds) {

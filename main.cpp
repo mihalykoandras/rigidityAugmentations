@@ -5,6 +5,9 @@
     adding minimal number of edges so that G becomes M-connected. 
     If G is (k,l)-tight, this latter adds the minimal number of edges to
     make G (k,l)-redundant.
+
+    This is an accompanying program to the PhD dissertation titled 
+    "Augmentation problems in count matroids and globally rigid graphs"
 */
 #include <iostream>
 

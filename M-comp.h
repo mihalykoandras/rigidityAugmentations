@@ -62,7 +62,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
     M_compHyperGraph() {}
 
     M_compHyperGraph(size_t n, unsigned int k_, int ell_) {
-        // 0 < k and 0 < ell <2k
+        // 0 < k and 0 < ell < 2k
         if (k_<= 0 || ell_ <=0 || ell_ >= 2 * k_) {
             std::cerr << "Bad constraints for k and ell, it works only if 0 < k and 0 < ell < 2k" << std::endl;
             throw 20;
