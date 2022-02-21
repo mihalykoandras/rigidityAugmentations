@@ -146,9 +146,14 @@ bool RedundHyperGraph::threeInTwo(
 
 std::vector<Edge> RedundHyperGraph::toRedund() {
     if (getNumberOfVertices() < 4) {
-        std::cerr << "Too few vertices in the graph to augment to comute its optimal augmentation." << std::endl;
+        std::cerr << "Too few vertices in the graph to augment to compute its optimal augmentation." << std::endl;
         throw 30;
     }
+    if (getNumberOfVertices() < k * k + 3) {
+        std::wcout << "Few vertices in the graph. Optimal augmentation might not be correctly computed. \
+        Double check with alternative methods!" << std::endl;
+    }
+
     if (isRigid()) {
         std::vector<std::shared_ptr<Vertex> > P = findTransversal();
         if (P.size() < 2) {

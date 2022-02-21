@@ -74,9 +74,13 @@ bool M_compHyperGraph::DFS(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v
     while (!Q.empty()) {
         std::shared_ptr<Vertex> actualVertex = Q.front();
         Q.pop();
+
+        // Dissertation, Algorithm 8.3 is executed here
+
         if (!(*actualVertex == *v1 || *actualVertex == *v2) &&
             getInDegree(actualVertex) < k) {  // actual vertex is correct, so
             // turn around and return
+
             std::shared_ptr<Vertex> v = actualVertex;
             do {
                 Node<std::shared_ptr<DirectedHyperEdge> >* comeFrom = getIncomingHyperedge(actualVertex);

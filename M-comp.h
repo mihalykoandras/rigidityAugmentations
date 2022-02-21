@@ -58,6 +58,9 @@ class M_compHyperGraph : public DirectedHyperGraph {
     bool DFS(std::shared_ptr<Vertex>  v1, std::shared_ptr<Vertex>  v2,
             std::vector<bool>& vertexUsedInDFS, std::vector<bool>& hyperEdgeUsedInDFS);
 
+    void changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >* edge, std::shared_ptr<Vertex>  to);
+
+
  public:
     M_compHyperGraph() {}
 
@@ -89,8 +92,6 @@ class M_compHyperGraph : public DirectedHyperGraph {
     ~M_compHyperGraph() {}
 
     std::shared_ptr<HyperEdge> makeNewHyperEdge(const std::vector<std::shared_ptr<Vertex> >& v_);
-
-    void changeDirection(Node<std::shared_ptr<DirectedHyperEdge> >* edge, std::shared_ptr<Vertex>  to);
 
     bool isRigid() const {return SpanningGraph.getEdges().size() == k* getNumberOfVertices() - ell;}
 
