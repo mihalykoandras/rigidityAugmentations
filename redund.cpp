@@ -64,9 +64,25 @@ std::shared_ptr<Vertex> RedundHyperGraph::findMinDegreeVertex() {
     return getVertex(bestDegree);
 }
 
+std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::getNeighbors(std::shared_ptr<Vertex> i,
+         std::vector<std::shared_ptr<Vertex> > L) {
+    std::vector<std::shared_ptr<Vertex> > N;
+    for (std::shared_ptr<Vertex> & v : L) {
+        if (getT(i, v).size() <= 2) {
+            N.push_back(v);
+        }
+    }
+    return N;
+}
+
 
 std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vector<std::shared_ptr<Vertex> > L) {
-    if (isRigid()) {
+    if (!isRigid()) {
+        std::cerr << "G is not rigid - can't compute transversal of MCT sets." <<std::endl;
+        throw 32;
+        return std::vector<std::shared_ptr<Vertex> >();
+    }
+
     std::shared_ptr<Vertex> i = findMinDegreeVertex();
     std::vector<std::shared_ptr<Vertex> > ViL = StarSearch(i, L);
     if (ViL.size() == 1) {
@@ -83,37 +99,29 @@ std::vector<std::shared_ptr<Vertex> > RedundHyperGraph::findTransversal(std::vec
             }
         }
     }
-    std::vector<std::shared_ptr<Vertex> > P = StarSearch(ViL[0], L);
-    P.push_back(ViL[0]);
+    std::vector<std::shared_ptr<Vertex> > N = getNeighbors(i, ViL);
+    // This could be incorporated to StarSearch for better performance
 
-    // The code separates here if l <= 3/2 k, then it is enough.
-    // Else we need to check every neighbor of i for potential smaller star, too.
+    if (N.size() == 0) {  // set is not simple
+        N.push_back(ViL[0]);
+    }
 
-    if (ell > 3 * k / 2) {
-        for (auto& edge : SpanningGraph.getEdges()) {
-            std::vector<int> indices = edge.getEdge();
-            if (indices[0] == i->getId() || indices[1] == i->getId()) {  // indexed with id
-                int nidx = indices[0] + indices[1] - i->getId();  // i's neighbor
-                std::shared_ptr<Vertex> ni = getVertex(nidx);
-                if (getT(i, ni).size() == 2) {
-                    std::vector<std::shared_ptr<Vertex> > P_potential = StarSearch(ni, L);
-                    P_potential.push_back(ni);
-                    if (P_potential.size() < P.size()) {
-                        P = P_potential;
-                        break;  // can be just one
-                    }
-                }
-            }
+    std::shared_ptr<Vertex> i0 = N[0];
+    size_t minSize = StarSearch(i0, L).size();
+    for (std::shared_ptr<Vertex> & v : N) {  // could be improved for efficiency - N[0] is checked twice
+        size_t vSize = StarSearch(v, L).size();
+        if (vSize < minSize) {
+            minSize = vSize;
+            i0 = v;
         }
     }
 
+    std::shared_ptr<Vertex> i1 = StarSearch(i0, L)[0];
 
+    std::vector<std::shared_ptr<Vertex> > P = StarSearch(i1, L);
+    P.push_back(i1);
 
     return P;
-    } else {
-        std::cerr << "G is not rigid - can't compute transversal of MCT sets." <<std::endl;
-        throw 32;
-    }
 }
 
 bool RedundHyperGraph::threeInTwo(
@@ -150,8 +158,8 @@ std::vector<Edge> RedundHyperGraph::toRedund() {
         throw 30;
     }
     if (getNumberOfVertices() < k * k + 3) {
-        std::wcout << "Few vertices in the graph. Optimal augmentation might not be correctly computed. \
-        Double check with alternative methods!" << std::endl;
+        std::wcout << "Few vertices in the graph. Optimal augmentation might not be correctly computed. "
+        "Double check with alternative methods!" << std::endl;
     }
 
     if (isRigid()) {

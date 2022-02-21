@@ -25,6 +25,9 @@ class RedundHyperGraph : public M_compHyperGraph {
     std::vector<std::shared_ptr<Vertex> > StarSearch(
         std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L);
         // Dissertation, Algorithm 8.7
+
+    std::vector<std::shared_ptr<Vertex> > getNeighbors(std::shared_ptr<Vertex> i, std::vector<std::shared_ptr<Vertex> > L);
+
     bool threeInTwo(const std::vector<std::shared_ptr<Vertex> >& T1,
         const std::vector<std::shared_ptr<Vertex> >& T2, const std::vector<std::shared_ptr<Vertex> >& T3,
         const std::vector<std::shared_ptr<Vertex> >& L1, const std::vector<std::shared_ptr<Vertex> >& L2) const;
