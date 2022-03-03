@@ -140,7 +140,7 @@ std::vector<std::shared_ptr<Vertex> > M_compHyperGraph::getTHyperEdges(
 
 
 void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
-    std::cout << "Vertices processed for M-comp hypergraph:" << std::endl;
+    //std::cout << "Vertices processed for M-comp hypergraph:" << std::endl;
     if (G.getNumberOfEdges() != 0) {
         SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
         int deletedHyperEdgeNumber = 0;
@@ -148,7 +148,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
 
             // Progress bar
-            std::cout << "[";
+           /* std::cout << "[";
             int barWidth = 70;
             float progress = static_cast<float>(i) / G.getNumberOfNodes();
             int pos = barWidth * progress;
@@ -160,7 +160,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
             }
             std::cout << "] " << int((progress + 0.003) * 100.0) << " %\r";
             std::cout.flush();
-
+*/
             //-------------------------------------
             // rearrange undirected hyperedges
 

@@ -52,12 +52,12 @@ int main(int argc, char *argv[]) {
         return e;
     }
     HG.MakeMCompHypergraph(G);
-    std::cout << " " << std::endl;
-    HG.print();
+    //std::cout << " " << std::endl;
+    //HG.print();
 
     RedundHyperGraph R(HG);
 
-    std::vector<std::shared_ptr<Vertex> > P;
+    /*std::vector<std::shared_ptr<Vertex> > P;
     bool exceptionCaught = true;
     try {
         P = R.findTransversal();
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
         }
         std::cout << std::endl;
     }
-    std::cout << "Optimal redund augmentation edges: " << std::endl;
+    std::cout << "Optimal redund augmentation edges: " << std::endl;*/
     std::vector<Edge> F;
     try {
         F = R.toRedund();
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
             return e;
         }
     }
-    for (Edge& f : F) {
+ /*   for (Edge& f : F) {
         f.print();
-    }
+    }*/
 }
