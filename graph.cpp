@@ -44,10 +44,25 @@ void DirectedHyperEdge::changeUnderlyingEdge(std::shared_ptr<HyperEdge> newHyper
     hyperEdge = newHyperEdge;
 }
 
+std::shared_ptr<Vertex> DirectedHyperGraph::getVertex(int id) const {
+    if (vertices.size() > id) {
+        return vertices[id];
+    }
+    throw std::runtime_error("No vertex found with index " + std::to_string(id));
+    return std::shared_ptr<Vertex>();
+}
+
+int DirectedHyperGraph::getInDegree(int id) const {
+    if (inDegree.size() > id) {
+        return inDegree[id];
+    }
+    throw std::runtime_error("No vertex found with index " + std::to_string(id));
+    return -1;
+}
 
 void DirectedHyperGraph::addHyperEdge(std::shared_ptr<HyperEdge> edge, const std::shared_ptr<Vertex>&  head) {
     /* 
-    Ads undirected hyperedge every time if it encounters for every "inMcomp"
+    Adds undirected hyperedge every time if it encounters for every "inMcomp"
     */
     undirectedHyperEdges.push_back(edge);
     directedHyperEdges.push_back(std::make_shared<DirectedHyperEdge>(head, edge));

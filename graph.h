@@ -246,9 +246,9 @@ class DirectedHyperGraph {
         inline size_t getNumberOfVertices() const {return size;}
         inline size_t getNumberOfEdges() const {return directedHyperEdges.size();}
 
-        inline std::shared_ptr<Vertex> getVertex(int i) {return vertices[i];}
-        inline int getInDegree(int id) {return inDegree[id];}
-        inline int getInDegree(const std::shared_ptr<Vertex>& v) {return inDegree[v->getId()];}
+        std::shared_ptr<Vertex> getVertex(int id) const;
+        int getInDegree(int id) const;
+        inline int getInDegree(const std::shared_ptr<Vertex>& v) const {return getInDegree(v->getId());}
 
         inline std::vector<std::shared_ptr<HyperEdge> >* getUndirectedHyperEdges() {return &undirectedHyperEdges;}
 
