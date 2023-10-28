@@ -19,8 +19,9 @@
 int main(int argc, char *argv[]) {
     unsigned int k = 2;
     int ell = 3;
+    bool create_m_comp_hypergraph = true;
     try {
-        if (argc == 3) {
+        if (argc >= 3) {
             if (atoi(argv[1]) > 0) {
                 k = atoi(argv[1]);
                 ell = atoi(argv[2]);
@@ -28,6 +29,9 @@ int main(int argc, char *argv[]) {
                 std::cerr << "k must be positive" << std::endl;
                 throw 1;
             }
+        }
+        if (argc == 4) {
+            create_m_comp_hypergraph = atoi(argv[3]);
         }
     } catch (int e) {
         std::cerr <<"Error code " << e << std::endl;
@@ -46,7 +50,7 @@ int main(int argc, char *argv[]) {
     M_compHyperGraph HG;
 
     try {
-        HG = M_compHyperGraph(G.getNumberOfNodes(), k, ell);
+        HG = M_compHyperGraph(G.getNumberOfNodes(), k, ell, !create_m_comp_hypergraph);
     } catch (int e) {
         std::cerr <<"Error code " << e << std::endl;
         return e;
@@ -55,36 +59,38 @@ int main(int argc, char *argv[]) {
     std::cout << " " << std::endl;
     HG.print();
 
-    RedundHyperGraph R(HG);
+    if (create_m_comp_hypergraph) {
+        RedundHyperGraph R(HG);
 
-    std::vector<std::shared_ptr<Vertex> > P;
-    bool exceptionCaught = true;
-    try {
-        P = R.findTransversal();
-        exceptionCaught = false;
-    } catch (int e) {
-        std::cerr <<"Error code " << e << std::endl;
-    }
-    if (!exceptionCaught) {
-        std::cout << "Transversal of the MCT sets of the M-comp hypergraph"  << std::endl;
-        for (std::shared_ptr<Vertex> v : P) {
-             v->print();
-             std::cout << " ";
+        std::vector<std::shared_ptr<Vertex> > P;
+        bool exceptionCaught = true;
+        try {
+            P = R.findTransversal();
+            exceptionCaught = false;
+        } catch (int e) {
+            std::cerr <<"Error code " << e << std::endl;
         }
-        std::cout << std::endl;
-    }
-    std::cout << "Optimal redund augmentation edges: " << std::endl;
-    std::vector<Edge> F;
-    try {
-        F = R.toRedund();
-    } catch (int e) {
-        std::cerr <<"Error code " << e << std::endl;
+        if (!exceptionCaught) {
+            std::cout << "Transversal of the MCT sets of the M-comp hypergraph"  << std::endl;
+            for (std::shared_ptr<Vertex> v : P) {
+                 v->print();
+                 std::cout << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "Optimal redund augmentation edges: " << std::endl;
+        std::vector<Edge> F;
+        try {
+            F = R.toRedund();
+        } catch (int e) {
+            std::cerr <<"Error code " << e << std::endl;
 
-        if (e == 31) {
-            return e;
+            if (e == 31) {
+                return e;
+            }
         }
-    }
-    for (Edge& f : F) {
-        f.print();
+        for (Edge& f : F) {
+            f.print();
+        }
     }
 }
