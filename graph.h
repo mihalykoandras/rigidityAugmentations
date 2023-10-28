@@ -64,6 +64,7 @@ class SimpleGraph {
     std::vector<int> getNeighbors(int i) {return neighborLists[i];}
 
     void readFromInput();
+    void print();
 };
 
 

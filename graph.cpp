@@ -19,6 +19,14 @@ void SimpleGraph::readFromInput() {
     }
 }
 
+void SimpleGraph::print() {
+    std::cout << "Graph on " << numberOfVertices << " vertices and " << edgeList.size() << " edges." << std::endl;
+    for (auto const& e : edgeList) {
+            e.print();
+    }
+}
+
+
 void DirectedHyperGraph::print() const {
     std::cout << "Number of vertices: " << getNumberOfVertices() << std::endl;
     std::cout << "Number of hyperedges: " << getNumberOfEdges() << std::endl;

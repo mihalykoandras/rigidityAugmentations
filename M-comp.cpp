@@ -12,6 +12,11 @@ void M_compHyperGraph::print() const {
     DirectedHyperGraph::printUndirectedHyperedges();
 }
 
+SimpleGraph& M_compHyperGraph::getSpanningGraph() {
+    return SpanningGraph;
+}
+
+
 std::shared_ptr<HyperEdge> M_compHyperGraph::makeNewHyperEdge(
             const std::vector<std::shared_ptr<Vertex> >& vert) {
     int newID = static_cast<int>(undirectedHyperEdges.size());

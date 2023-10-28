@@ -110,5 +110,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
     void MakeMCompHypergraph(SimpleGraph& G);
 
+    SimpleGraph& getSpanningGraph();
+
     void print() const;
 };
