@@ -144,7 +144,7 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
     if (G.getNumberOfEdges() != 0) {
         SimpleGraph Gprime(G.getNumberOfNodes());  // graph of the already used edges
         int deletedHyperEdgeNumber = 0;
-        double rearrangeRatio = 10;  // if more than this is non-existing edges, we delet those
+        const double rearrangeRatio = 10;  // if more than this is non-existing edges, we delete those
         for (int i = 0; i < G.getNumberOfNodes(); i++) {
 
             // Progress bar
@@ -187,21 +187,21 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
             for (int neighborId : neighborIds) {
                 std::shared_ptr<Vertex> neighbor = getVertex(neighborId);
 
-            if (v < neighbor) {  // not to add two times
-                // Gprime is jut a check, it could be deleted for faster run
-                Gprime.addEdge(v->getId(), neighbor->getId());
+                if (v->getId() < neighbor->getId()) {  // not to add two times
+                    // Gprime is jut a check, it could be deleted for faster run
+                    Gprime.addEdge(v->getId(), neighbor->getId());
 
-                if (inTheSameM_componentWith_i[neighbor->getId()])
+                    if (inTheSameM_componentWith_i[neighbor->getId()])
                     continue;  // in this case, no action is needed
 
-                std::vector<bool> usedHyperEdge;
-                std::vector<std::shared_ptr<Vertex> > T = getTHyperEdges(v, neighbor, usedHyperEdge);
+                    std::vector<bool> usedHyperEdge;
+                    std::vector<std::shared_ptr<Vertex> > T = getTHyperEdges(v, neighbor, usedHyperEdge);
 
-                if (T.empty()) {  // you can add one edge
-                    std::shared_ptr<HyperEdge> newHyperEdge =
-                        makeNewHyperEdge(std::vector<std::shared_ptr<Vertex> >({v, neighbor}));
-                        // this is a new edge, that is trivial
-                    SpanningGraph.addEdge(v->getId(), neighbor->getId());
+                    if (T.empty()) {  // you can add one edge
+                        std::shared_ptr<HyperEdge> newHyperEdge =
+                            makeNewHyperEdge(std::vector<std::shared_ptr<Vertex> >({v, neighbor}));
+                            // this is a new edge, that is trivial
+                        SpanningGraph.addEdge(v->getId(), neighbor->getId());
                     if (getInDegree(v) < getInDegree(neighbor)) {
                         addHyperEdge(newHyperEdge, v);
                     } else {
