@@ -25,6 +25,9 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
 
  private:
+    // if create only the tight graph and not the M copm hypergraph. 
+    // Important for testing purposes
+    bool m_create_only_tight_graph;
     std::vector<Node<std::shared_ptr<DirectedHyperEdge> >* > comeFrom;
         // contains the list of hyperedges needed to get to this node
     std::vector<bool> trivial;
@@ -64,17 +67,15 @@ class M_compHyperGraph : public DirectedHyperGraph {
  public:
     M_compHyperGraph() {}
 
-    M_compHyperGraph(size_t n, unsigned int k_, int ell_) {
+    M_compHyperGraph(size_t n, unsigned int k_, int ell_, bool create_only_tight_graph = false) : 
+                k(k_), ell(ell_),  SpanningGraph(SimpleGraph(n)), m_create_only_tight_graph(create_only_tight_graph) {
         // 0 < k and 0 < ell < 2k
         if (k_<= 0 || ell_ <=0 || ell_ >= 2 * k_) {
             std::cerr << "Bad constraints for k and ell, it works only if 0 < k and 0 < ell < 2k" << std::endl;
             throw 20;
         }
 
-        k = k_;
-        ell = ell_;
         size = n;
-        SpanningGraph = SimpleGraph(size);
         for (size_t i = 0; i < size; i++) {
             insertNewVertex(i);
         }
@@ -87,6 +88,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
         SpanningGraph = HG.SpanningGraph;
         comeFrom = HG.comeFrom;
         trivial = HG.trivial;
+        m_create_only_tight_graph = HG.m_create_only_tight_graph;
     }
 
     ~M_compHyperGraph() {}

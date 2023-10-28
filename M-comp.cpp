@@ -207,26 +207,28 @@ void M_compHyperGraph::MakeMCompHypergraph(SimpleGraph& G) {
                             makeNewHyperEdge(std::vector<std::shared_ptr<Vertex> >({v, neighbor}));
                             // this is a new edge, that is trivial
                         SpanningGraph.addEdge(v->getId(), neighbor->getId());
-                    if (getInDegree(v) < getInDegree(neighbor)) {
-                        addHyperEdge(newHyperEdge, v);
-                    } else {
-                        addHyperEdge(newHyperEdge, neighbor);
-                    }
-                    trivial.push_back(true);
-                    continue;
-                } else {
-                    std::shared_ptr<HyperEdge> newHyperEdge = makeNewHyperEdge(T);
-                    undirectedHyperEdges.push_back(newHyperEdge);
-                    trivial.push_back(false);
-                    // non-trivial new edge
-                    for (auto& dirHyperEdge : directedHyperEdges) {
-                        if (usedHyperEdge[dirHyperEdge->getHyperEdge()->getId()]) {
-                            deletedHyperEdgeNumber++;
-                            dirHyperEdge->changeUnderlyingEdge(newHyperEdge);
+                        if (getInDegree(v) < getInDegree(neighbor)) {
+                            addHyperEdge(newHyperEdge, v);
+                        } else {
+                            addHyperEdge(newHyperEdge, neighbor);
                         }
-                    }
+                        trivial.push_back(true);
+                        continue;
+                    } else {
+                        if (!m_create_only_tight_graph) {
+                            std::shared_ptr<HyperEdge> newHyperEdge = makeNewHyperEdge(T);
+                            undirectedHyperEdges.push_back(newHyperEdge);
+                            trivial.push_back(false);
+                            // non-trivial new edge
+                            for (auto& dirHyperEdge : directedHyperEdges) {
+                                if (usedHyperEdge[dirHyperEdge->getHyperEdge()->getId()]) {
+                                    deletedHyperEdgeNumber++;
+                                    dirHyperEdge->changeUnderlyingEdge(newHyperEdge);
+                                }
+                            }
+                        }
+                    }   
                 }
-            }
             }
         }
     }
