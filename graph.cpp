@@ -72,7 +72,7 @@ void DirectedHyperGraph::addHyperEdge(std::shared_ptr<HyperEdge> edge, const std
 
 void DirectedHyperGraph::addDirEdge(const std::shared_ptr<Vertex>&  head, const std::shared_ptr<Vertex>& tail) {
     /* 
-    Ads one directed edge as a hyperedge. No new non-trivial M-component appears by this
+    Adds one directed edge as a hyperedge. No new non-trivial M-component appears by this
     */
     std::vector<std::shared_ptr<Vertex> > vertices = {head, tail};
     std::shared_ptr<HyperEdge> edge = std::make_shared<HyperEdge>(vertices, undirectedHyperEdges.size());
