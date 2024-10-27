@@ -25,10 +25,11 @@ class M_compHyperGraph : public DirectedHyperGraph {
 
 
  private:
+    // contains the list of hyperedges needed to get to this node
     std::vector<Node<std::shared_ptr<DirectedHyperEdge> >* > comeFrom;
-        // contains the list of hyperedges needed to get to this node
+
+    // if it is underlying hyperedge for a non-trivial M-component or not
     std::vector<bool> trivial;
-        // if it is underlying hyperedge for a non-trivial M-component or not
 
     inline Node<std::shared_ptr<DirectedHyperEdge> >* getIncomingHyperedge(int id) {return comeFrom[id];}
     inline Node<std::shared_ptr<DirectedHyperEdge> >* getIncomingHyperedge(const Vertex& v) {
@@ -111,4 +112,7 @@ class M_compHyperGraph : public DirectedHyperGraph {
     void MakeMCompHypergraph(SimpleGraph& G);
 
     void print() const;
+
+    SimpleGraph getSimpleGraph() const {return SpanningGraph;}
+
 };
