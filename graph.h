@@ -64,6 +64,10 @@ class SimpleGraph {
     std::vector<int> getNeighbors(int i) {return neighborLists[i];}
 
     void readFromInput();
+
+    // Use OGDFto build the SPQR-tree
+    bool is3Connected() const;
+
 };
 
 

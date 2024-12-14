@@ -1,3 +1,4 @@
 g.out
 .vscode/
 build/
+.clang-format
