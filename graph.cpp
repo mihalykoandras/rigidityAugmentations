@@ -1,6 +1,8 @@
 // Copyright 2021 András Mihálykó MIT License
 
 #include <iostream>
+#include <ogdf/basic/Graph.h>
+#include <ogdf/decomposition/SPQRTree.h>
 
 #include "graph.h"
 
