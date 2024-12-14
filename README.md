@@ -12,15 +12,22 @@ and [Globally rigid augmentation of rigid graphs](https://web.cs.elte.hu/egres/t
 ### Usage
 
 The code is tested with C++14. 
-Can be compiled with g++ by 
+Can be compiled using CMake: 
 
->g++ *.cpp -std=c++14 -O3 -o rigidAugmentations
+>mkdir build
+>cd build
+>cmake ..
+>make
 
-The driver (main.cpp) accepts two parameters, k and l. Default value is (k,l) = (2,3). For example with the previous compile running
+You can easily swith between debug and release mode using 
 
->./rigidAugmentations 1 1 
+>cmake -DCMAKE_BUILD_TYPE=Debug ..
 
-will work on the (1,1)-sparsity matroid, (i.e. graphical matroid, aka tree).
+Or 
+
+>cmake -DCMAKE_BUILD_TYPE=Release ..
+
+Will work on the (1,1)-sparsity matroid, (i.e. graphical matroid, aka tree).
 
 The program reads the graph in edge-list form from the standard input and writes to the standard input. 
 
